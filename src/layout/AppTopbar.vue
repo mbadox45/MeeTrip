@@ -98,7 +98,7 @@ const isOutsideClicked = (event) => {
 </script>
 
 <template>
-    <div class="layout-topbar bg-cyan-200 dark">
+    <div class="layout-topbar">
         <Dialog v-model:visible="displayConfirmation" :style="{ width: '350px' }" :modal="true" position="topright" :draggable="false">
             <template #header>
                 <h4>Sign Out</h4>
@@ -112,29 +112,23 @@ const isOutsideClicked = (event) => {
                 <Button label="Yes" icon="pi pi-check" @click="onSettingsClick" class="p-button-danger" autofocus />
             </template>
         </Dialog>
-        <router-link to="/" class="layout-topbar-logo justify-content-center">
-            <!-- <img src="/layout/inl.png" alt="PT Industri Nabati Lestari" /> -->
-            <!-- <img :src="logoUrl" alt="logo" /> -->
-            <span class="ml-2 text-cyan-800">SURVEY - INL</span>
+        <button class="p-link sm:layout-topbar-menu-button md:  layout-topbar-button text-cyan-800" v-tooltip.bottom="'Menu'" @click="onMenuToggle()">
+            <i class="pi pi-th-large"></i>
+        </button>
+        <!-- <div class="pr-6 sm: pr-1">
+        </div> -->
+        <router-link to="/" class="layout-topbar-logo">
+            <img src="/layout/meetrip.png" alt="PT Industri Nabati Lestari" />
+            <span class="ml-2">MeeTrip</span>
         </router-link>
 
-        <button class="p-link layout-menu-button layout-topbar-button text-cyan-800" @click="onMenuToggle()">
-            <i class="pi pi-bars"></i>
-        </button>
 
         <button class="p-link layout-topbar-menu-button layout-topbar-button text-cyan-800" @click="onTopBarMenuButton()">
             <i class="pi pi-ellipsis-v"></i>
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button> -->
-            <!-- <button :class="`p-link layout-topbar-button text-cyan-800`" v-show="roles != 'admin'" @click="viewUpdate">
-                <i class="pi pi-user"></i>
-                <span>Profile</span>
-            </button> -->
+            
             <button @click="displayConfirmation = true" class="p-link layout-topbar-button text-cyan-800">
                 <i class="pi pi-sign-out"></i>
                 <span>Sign Out</span>

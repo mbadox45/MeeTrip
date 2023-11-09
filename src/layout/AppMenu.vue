@@ -41,13 +41,24 @@ const Menu = () => {
             },
             
             {
-                label: 'Management',
+                label: 'Main Menu',
                 items: [
-                    { label: 'Users', icon: 'pi pi-fw pi-users', to: '/users',},
-                    // { label: 'Categories', icon: 'pi pi-fw pi-check-square', to: '/categories', },
-                    { label: 'Questions', icon: 'pi pi-fw pi-question-circle', to: '/questions', },
+                    { label: 'SPDK', icon: 'pi pi-fw pi-car', 
+                        items: [
+                            {
+                                label: 'My SPDK',
+                                icon: 'pi pi-fw pi-briefcase',
+                                to: '/spdk'
+                            },
+                            {
+                                label: 'Logs',
+                                icon: 'pi pi-fw pi-history',
+                                to: '/logs'
+                            },
+                        ]
+                    },
+                    { label: 'Meeting Room', icon: 'pi pi-fw pi-question-circle', to: '/questions', },
                     { label: 'Survey', icon: 'pi pi-fw pi-comments', to: '/survey', },
-                    // { label: 'Response', icon: 'pi pi-fw pi-reply', to: '/respon', },
                 ]
             },
         ]
@@ -62,7 +73,8 @@ const load = () => {
 <template>
     <ul class="layout-menu">
         <li class="mb-3 text-center">
-            <img src="/layout/inl.png" alt="Prime Blocks" class="w-6 mt-3" />
+            <Avatar image="/distributor.png" class="bg-red-100 mt-3" size="xlarge" shape="circle" />
+            <!-- <img src="/layout/inl.png" alt="PT Industri Nabati Lestari" class="w-6 mt-3" /> -->
         </li>
         <li class="text-center">
             <strong>{{ payload.name }}</strong>

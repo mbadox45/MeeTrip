@@ -4,14 +4,14 @@ const layoutConfig = reactive({
     ripple: false,
     darkTheme: false,
     inputStyle: 'outlined',
-    menuMode: 'overlay',
+    menuMode: 'static',
     theme: 'lara-light-indigo',
     scale: 14,
     activeMenuItem: null
 });
 
 const layoutState = reactive({
-    staticMenuDesktopInactive: false,
+    staticMenuDesktopInactive: true,
     overlayMenuActive: false,
     profileSidebarVisible: false,
     configSidebarVisible: false,

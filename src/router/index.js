@@ -10,6 +10,22 @@ const router = createRouter({
             component: AppLayout,
             redirect:'/home',
             children: [
+                // MEETRIP
+                // Administrator
+                {
+                    path: '/home',
+                    name: 'home',
+                    component: () => import('@/views/meetrip/home/Index.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        admin:true,
+                        distributor:true,
+                    }
+                },
+
+
+// ====================================================================================================================================
+                // SURVEY
                 // Distributor
                 {
                     path: '/beranda',
@@ -40,15 +56,6 @@ const router = createRouter({
                 },
 
                 // Administrator
-                {
-                    path: '/home',
-                    name: 'home',
-                    component: () => import('@/views/survey/administrator/pages/Home.vue'),
-                    meta:{
-                        requiresAuth: true,
-                        admin:true,
-                    }
-                },
                 {
                     path: '/users',
                     name: 'users',
