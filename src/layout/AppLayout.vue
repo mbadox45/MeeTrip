@@ -122,9 +122,9 @@ const parseJwt = (token) => {
 </script>
 
 <template>
-    <div class="layout-wrapper" :class="containerClass">
+    <div class="layout-wrapper bg-gray-100" :class="containerClass">
         <app-topbar></app-topbar>
-        <div class="layout-sidebar">
+        <div class="layout-sidebar bg-teal-600">
             <app-sidebar></app-sidebar>
         </div>
         <div class="layout-main-container">
@@ -133,7 +133,7 @@ const parseJwt = (token) => {
             </div>
             <app-footer></app-footer>
         </div>
-        <app-config></app-config>
+        <!-- <app-config></app-config> -->
         <div class="layout-mask"></div>
     </div>
 </template>

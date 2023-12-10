@@ -7,7 +7,9 @@ const { layoutConfig, onMenuToggle } = useLayout();
 
 // API
 import UserService from '@/api/UserService';
+import { APP_NAME } from '@/api/DataVariable.js';
 
+const apps = ref(APP_NAME);
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const displayConfirmation = ref(false);
@@ -42,26 +44,21 @@ const onTopBarMenuButton = () => {
 };
 const onSettingsClick = () => {
     // const roles = localStorage.getItem('roles');
-    if (roles == 'distributor') {
-        try {
-            const resp = UserService.logoutUser();
-            const load = resp.data;
-            if (load.code == 200) {
-                localStorage.removeItem('usertoken');
-                localStorage.removeItem('payload');
-                localStorage.removeItem('roles');
-                router.push('/auth/login');
-            }
-        } catch (error) {
+    try {
+        const resp = UserService.logoutUser();
+        const load = resp.data;
+        if (load.code == 200) {
             localStorage.removeItem('usertoken');
             localStorage.removeItem('payload');
             localStorage.removeItem('roles');
             router.push('/auth/login');
+            window.close();
         }
-    } else {
+    } catch (error) {
         localStorage.removeItem('usertoken');
         localStorage.removeItem('payload');
         localStorage.removeItem('roles');
+        router.push('/auth/login');
         window.close();
     }
 };
@@ -95,10 +92,25 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+const items = ref([
+    {
+        label: 'Furniture',
+        icon: 'pi pi-box',
+    },
+    {
+        label: 'Electronics',
+        icon: 'pi pi-mobile',
+    },
+    {
+        label: 'Sports',
+        icon: 'pi pi-clock',
+    }
+]);
 </script>
 
 <template>
-    <div class="layout-topbar">
+    <div class="py-3 px-5 fixed w-full bg-gray-100 z-3">
         <Dialog v-model:visible="displayConfirmation" :style="{ width: '350px' }" :modal="true" position="topright" :draggable="false">
             <template #header>
                 <h4>Sign Out</h4>
@@ -112,14 +124,36 @@ const isOutsideClicked = (event) => {
                 <Button label="Yes" icon="pi pi-check" @click="onSettingsClick" class="p-button-danger" autofocus />
             </template>
         </Dialog>
+        <Menubar class="shadow-2 bg-yellow-200" style="border-radius: 3rem">
+            <template #start>
+                <div class="flex align-items-center">
+                    <router-link to="/" class="flex align-items-center">
+                        <img src="/layout/meetrip.png" alt="PT Industri Nabati Lestari" class="mx-3" style="width: 50px;" />
+                        <span class="text-2xl font-semibold text-pink-700 hidden sm:block md:block">{{apps}}</span>
+                    </router-link>
+                </div>
+            </template>
+            <template #end>
+                <button class="p-link sm:layout-topbar-menu-button md:layout-topbar-button text-orange-400 mx-3 p-2 bg-yellow-50 border-circle" v-tooltip.bottom="'Menu'" @click="onMenuToggle()">
+                    <i class="pi pi-th-large text-3xl m-1"></i>
+                </button>
+                    <!-- <Divider layout="vertical" class="hidden sm:block md:block"/> -->
+                <button @click="displayConfirmation = true" class="p-link layout-topbar-button text-orange-400 mx-3 p-2 bg-yellow-50 border-circle" v-tooltip.bottom="'Sign Out'">
+                    <i class="pi pi-sign-out text-3xl m-1"></i>
+                </button>
+                <!-- <div class="layout-topbar-menu" :class="topbarMenuClasses">
+                </div> -->
+            </template>
+        </Menubar>
+    </div>
+    <!-- <div class="layout-topbar bg-yellow-100">
+        
         <button class="p-link sm:layout-topbar-menu-button md:  layout-topbar-button text-cyan-800" v-tooltip.bottom="'Menu'" @click="onMenuToggle()">
             <i class="pi pi-th-large"></i>
         </button>
-        <!-- <div class="pr-6 sm: pr-1">
-        </div> -->
         <router-link to="/" class="layout-topbar-logo">
-            <img src="/layout/meetrip.png" alt="PT Industri Nabati Lestari" />
-            <span class="ml-2">MeeTrip</span>
+            <img src="/layout/meetrip.png" alt="PT Industri Nabati Lestari" class="mx-3" />
+            <span>{{apps}}</span>
         </router-link>
 
 
@@ -134,7 +168,7 @@ const isOutsideClicked = (event) => {
                 <span>Sign Out</span>
             </button>
         </div>
-    </div>
+    </div> -->
 </template>
 
 <style lang="scss" scoped></style>

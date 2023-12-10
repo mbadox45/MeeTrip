@@ -106,6 +106,10 @@ import BlockViewer from '@/components/BlockViewer.vue';
 // JSON to Excel for VUE 3
 import JsonExcel from "vue-json-excel3";
 
+// Components Gmaps API
+import { GoogleMap, Marker, InfoWindow, Circle, Polygon, MarkerCluster, Polyline } from "vue3-google-map";
+// import { useGmap, useGmapMarker } from 'vuejs3-google-maps';
+
 import '@/assets/styles.scss';
 
 const app = createApp(App);
@@ -123,6 +127,18 @@ app.directive('styleclass', StyleClass);
 
 app.component('CodeHighlight', CodeHighlight);
 app.component('BlockViewer', BlockViewer);
+
+// app.component('GMapMap', useGmap);
+
+
+// Google Maps API
+app.component('GoogleMap', GoogleMap);
+app.component('Marker', Marker);
+app.component('InfoWindow', InfoWindow);
+app.component('Circle', Circle);
+app.component('Polygon', Polygon);
+app.component('Polyline', Polyline);
+app.component('MarkerCluster', MarkerCluster);
 
 app.component('Accordion', Accordion);
 app.component('AccordionTab', AccordionTab);

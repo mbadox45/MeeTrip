@@ -1,7 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 
+// Components
 import AppMenuItem from './AppMenuItem.vue';
+
+// API
+import { menu_superadmin, menu_adminsdm, menu_adminga, menu_admincnb, menu_user, menu_user_approve, menu_admincs } from '@/api/DataVariable.js';
 
 const payload = ref(JSON.parse(localStorage.getItem('payload')));
 const token = localStorage.getItem('usertoken');
@@ -16,52 +20,23 @@ onMounted(() => {
 });
 
 const Menu = () => {
-    // console.log(roles)
-    if (roles == 'distributor') {
-        model.value = [
-            {
-                label: 'Menu',
-                items: [
-                    { label: 'Beranda', icon: 'pi pi-fw pi-home', to: '/beranda' },
-                    { label: 'Survey', icon: 'pi pi-fw pi-comments', to: '/survey-user' },
-                ]
-            },
-            {
-                label: 'Profile',
-                items: [
-                    { label: 'Update Password', icon: 'pi pi-fw pi-lock', to: '/update-password' },
-                ]
-            },
-        ];
+    console.log(roles, payload.value.grade)
+    if (roles == 'superadmin') {
+        model.value = menu_superadmin;
+    } else if (roles == 'adminsdm') {
+        model.value = menu_adminsdm;
+    } else if (roles == 'adminga') {
+        model.value = menu_adminga;
+    } else if (roles == 'admincnb') {
+        model.value = menu_admincnb;
+    } else if (roles == 'admincs') {
+        model.value = menu_admincs;
     } else {
-        model.value = [
-            {
-                label: 'Home',
-                items: [{ label: 'Home', icon: 'pi pi-fw pi-home', to: '/home' }]
-            },
-            
-            {
-                label: 'Main Menu',
-                items: [
-                    { label: 'SPDK', icon: 'pi pi-fw pi-car', 
-                        items: [
-                            {
-                                label: 'My SPDK',
-                                icon: 'pi pi-fw pi-briefcase',
-                                to: '/spdk'
-                            },
-                            {
-                                label: 'Logs',
-                                icon: 'pi pi-fw pi-history',
-                                to: '/logs'
-                            },
-                        ]
-                    },
-                    { label: 'Meeting Room', icon: 'pi pi-fw pi-question-circle', to: '/questions', },
-                    { label: 'Survey', icon: 'pi pi-fw pi-comments', to: '/survey', },
-                ]
-            },
-        ]
+        if (payload.value.grade >= 3) {
+            model.value = menu_user_approve;
+        } else {
+            model.value = menu_user;
+        }
     }
 }
 
@@ -73,13 +48,13 @@ const load = () => {
 <template>
     <ul class="layout-menu">
         <li class="mb-3 text-center">
-            <Avatar image="/distributor.png" class="bg-red-100 mt-3" size="xlarge" shape="circle" />
+            <Avatar image="layout/inl-ori2.png" class="bg-white mt-3 " style="width: 80px; height: 80px;" shape="circle" />
             <!-- <img src="/layout/inl.png" alt="PT Industri Nabati Lestari" class="w-6 mt-3" /> -->
         </li>
-        <li class="text-center">
+        <li class="text-center text-lg text-yellow-100">
             <strong>{{ payload.name }}</strong>
         </li>
-        <li class="text-center mb-5">
+        <li class="text-center text-sm font-semibold text-yellow-200 mb-5">
             <span>{{ payload.email }}</span>
         </li>
         <Divider class="my-5" />

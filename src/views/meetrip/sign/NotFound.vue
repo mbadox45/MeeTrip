@@ -1,10 +1,13 @@
 <script setup>
     import { ref, onMounted } from 'vue';
     import { useRouter  } from 'vue-router';
+
     import VerifyService from '@/api/VerifyService';
+    import { APP_NAME } from '@/api/DataVariable.js';
 
     const router = useRouter();
 
+    const apps = ref(APP_NAME);
     const idUser = ref(null);
     const loadings = ref(true);
 
@@ -21,7 +24,7 @@
                 <div class="text-900 font-bold text-5xl mb-3">404</div>
                 <div class="text-700 text-2xl mb-5">Not Found</div>
                 <Button @click="pushBack()" label="Back" icon="pi pi-chevron-left" class="font-bold px-5 py-3 p-button-raised p-button-rounded p-button-secondary white-space-nowrap"></Button>
-                <div class="text-gray-400 font-bold mt-5">SURVEY &nbsp; | &nbsp; PT INDUSTRI NABATI LESTARI</div>
+                <div class="text-gray-400 font-bold mt-5">{{apps}} &nbsp; | &nbsp; PT INDUSTRI NABATI LESTARI</div>
             </div>
         </div>
     </div>

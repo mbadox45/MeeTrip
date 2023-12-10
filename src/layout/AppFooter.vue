@@ -1,8 +1,12 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+
+// API
+import { APP_NAME } from '@/api/DataVariable.js';
 
 const { layoutConfig } = useLayout();
+const apps = ref(APP_NAME)
 
 const logoUrl = computed(() => {
     return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
@@ -15,7 +19,7 @@ const logoUrl = computed(() => {
         <!-- <div class="grid">
             <div class="col-12 lg:col-6 md:col-6"></div>
         </div> -->
-        <strong>MeeTrip </strong>
+        <strong>{{apps}} </strong>
         <p><span class="font-semibold">ICT Development</span> <span class="mx-1">&copy;</span> 2023 - PT. Industri Nabati Lestari</p>
         <!-- <img :src="logoUrl" alt="Logo" height="20" class="mr-2" />
         by

@@ -11,130 +11,72 @@ const router = createRouter({
             redirect:'/home',
             children: [
                 // MEETRIP
-                // Administrator
                 {
                     path: '/home',
                     name: 'home',
                     component: () => import('@/views/meetrip/home/Index.vue'),
                     meta:{
                         requiresAuth: true,
-                        admin:true,
-                        distributor:true,
-                    }
-                },
-
-
-// ====================================================================================================================================
-                // SURVEY
-                // Distributor
-                {
-                    path: '/beranda',
-                    name: 'beranda',
-                    component: () => import('@/views/survey/distributor/Home/Index.vue'),
-                    meta:{
-                        requiresAuth: true,
-                        distributor:true,
+                        superadmin:true,
+                        adminsdm:true,
+                        adminga:true,
+                        admincnb:true,
+                        admincs:true,
+                        user:true,
                     }
                 },
                 {
-                    path: '/survey-user',
-                    name: 'survey-user',
-                    component: () => import('@/views/survey/distributor/Survey/Index.vue'),
+                    path: '/my-spdk',
+                    name: 'my-spdk',
+                    component: () => import('@/views/meetrip/spdk/MySpdk.vue'),
                     meta:{
                         requiresAuth: true,
-                        distributor:true,
+                        user:true,
                     }
                 },
                 {
-                    path: '/update-password',
-                    name: 'update-password',
-                    component: () => import('@/views/survey/distributor/Profile/Index.vue'),
+                    path: '/form-bto',
+                    name: 'form-bto',
+                    component: () => import('@/views/meetrip/spdk/FormBTO.vue'),
                     meta:{
                         requiresAuth: true,
-                        distributor:true,
-                    }
-                },
-
-                // Administrator
-                {
-                    path: '/users',
-                    name: 'users',
-                    component: () => import('@/views/survey/administrator/pages/Users.vue'),
-                    meta:{
-                        requiresAuth: true,
-                        admin:true,
+                        user:true,
                     }
                 },
                 {
-                    path: '/categories',
-                    name: 'categories',
-                    component: () => import('@/views/survey/administrator/pages/Categories.vue'),
+                    path: '/booked',
+                    name: 'booked',
+                    component: () => import('@/views/meetrip/meeting/Booked.vue'),
                     meta:{
                         requiresAuth: true,
-                        admin:true,
+                        user:true,
                     }
                 },
                 {
-                    path: '/questions',
-                    name: 'questions',
-                    component: () => import('@/views/survey/administrator/pages/Questions.vue'),
+                    path: '/my-booking',
+                    name: 'my-booking',
+                    component: () => import('@/views/meetrip/meeting/MyBooking.vue'),
                     meta:{
                         requiresAuth: true,
-                        admin:true,
+                        user:true,
                     }
                 },
                 {
-                    path: '/survey',
-                    name: 'survey',
-                    component: () => import('@/views/survey/administrator/pages/Surveys/Index.vue'),
+                    path: '/test-maps',
+                    name: 'test-maps',
+                    component: () => import('@/views/meetrip/spdk/TestMaps.vue'),
                     meta:{
                         requiresAuth: true,
-                        admin:true,
+                        user:true,
                     }
                 },
                 {
-                    path: '/edit-question/:id',
-                    name: 'edit-question',
-                    component: () => import('@/views/survey/administrator/pages/EditQuestion.vue'),
+                    path: '/test-maps2',
+                    name: 'test-maps2',
+                    component: () => import('@/views/meetrip/spdk/TestMaps2.vue'),
                     meta:{
                         requiresAuth: true,
-                        admin:true,
-                    }
-                },
-                {
-                    path: '/form-question/:cond',
-                    name: 'form-question',
-                    component: () => import('@/views/survey/administrator/pages/Question/Components/FormQuestions.vue'),
-                    meta:{
-                        requiresAuth: true,
-                        admin:true,
-                    }
-                },
-                {
-                    path: '/form-survey/:cond',
-                    name: 'form-survey',
-                    component: () => import('@/views/survey/administrator/pages/Surveys/Components/FormSurvey.vue'),
-                    meta:{
-                        requiresAuth: true,
-                        admin:true,
-                    }
-                },
-                {
-                    path: '/response-survey/:id',
-                    name: 'response-survey',
-                    component: () => import('@/views/survey/administrator/pages/Surveys/Components/ResponseSurvey.vue'),
-                    meta:{
-                        requiresAuth: true,
-                        admin:true,
-                    }
-                },
-                {
-                    path: '/response-survey-byuser/:id',
-                    name: 'response-survey-byuser',
-                    component: () => import('@/views/survey/administrator/pages/Surveys/Components/ResponseUser.vue'),
-                    meta:{
-                        requiresAuth: true,
-                        admin:true,
+                        user:true,
                     }
                 },
             ]
@@ -142,10 +84,10 @@ const router = createRouter({
         {
             path: '/sign-out',
             name: 'signout',
-            component: () => import('@/views/survey/administrator/sign/SignOut.vue'),
+            component: () => import('@/views/meetrip/sign/SignOut.vue'),
             meta:{
                 requiresAuth: true,
-                distributor:true,
+                user:true,
                 // admin:true,
             }
         },
@@ -160,20 +102,15 @@ const router = createRouter({
         {
             path: '/verify/:id',
             name: 'verify',
-            component: () => import('@/views/survey/administrator/sign/Verify.vue'),
+            component: () => import('@/views/meetrip/sign/Verify.vue'),
             meta:{
                 guestOnly:true,
             }
         },
         {
-            path: '/form/preview/:id',
-            name: 'preview',
-            component: () => import('@/views/survey/administrator/pages/FormPreview.vue'),
-        },
-        {
             path: '/:pathMatch(.*)*',
             name: 'notfound',
-            component: () => import('@/views/survey/administrator/sign/NotFound.vue')
+            component: () => import('@/views/meetrip/sign/NotFound.vue')
         },
     ]
 });
@@ -185,17 +122,41 @@ router.beforeEach((to, from, next) => {
 
     if (to.matched.some((route) => route.meta.requiresAuth)) {
         if (tokens) {
-            if (roles == 'admin') {
-                if (to.matched.some((route) => route.meta.admin)) {
+            if (roles == 'superadmin') {
+                if (to.matched.some((route) => route.meta.superadmin)) {
+                    next();
+                } else {
+                    next('/home');
+                }
+            } else if (roles == 'adminsdm') {
+                if (to.matched.some((route) => route.meta.adminsdm)) {
+                    next();
+                } else {
+                    next('/home');
+                }
+            } else if (roles == 'adminga') {
+                if (to.matched.some((route) => route.meta.adminga)) {
+                    next();
+                } else {
+                    next('/home');
+                }
+            } else if (roles == 'admincnb') {
+                if (to.matched.some((route) => route.meta.admincnb)) {
+                    next();
+                } else {
+                    next('/home');
+                }
+            } else if (roles == 'admincs') {
+                if (to.matched.some((route) => route.meta.admincs)) {
                     next();
                 } else {
                     next('/home');
                 }
             } else {
-                if (to.matched.some((route) => route.meta.distributor)) {
+                if (to.matched.some((route) => route.meta.user)) {
                     next();
                 } else {
-                    next('/beranda');
+                    next('/home');
                 }
             }
         } else {
@@ -203,11 +164,7 @@ router.beforeEach((to, from, next) => {
         }
     } else if (to.matched.some((route) => route.meta.guestOnly)) {
         if (tokens) {
-            if (roles == 'admin') {
-                next('/home');
-            } else {
-                next('/beranda');
-            }
+            next('/home');
         } else {
             next();
         }

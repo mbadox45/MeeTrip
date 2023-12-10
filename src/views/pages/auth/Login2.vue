@@ -10,8 +10,10 @@ import AppConfig from '@/layout/AppConfig.vue';
 
 // API
 import AuthService from '@/api/AuthService';
-import { URL_WEB, URL_WEB_Portal } from '@/api/DataVariable';
+import { URL_WEB, URL_WEB_Portal } from '@/api/env';
+import { APP_NAME } from '@/api/DataVariable.js';
 
+const apps = ref(APP_NAME);
 const toast = useToast();
 const router = useRouter();
 const { layoutConfig } = useLayout();
@@ -93,7 +95,7 @@ const onSubmit = (e) => {
             <div class="w-full py-6 sm:py-2 px-5 sm:px-4" style="border-radius: 53px">
                 <div class="text-center">
                     <img src="/layout/inl.png" alt="PT.INL" class="w-10rem flex-shrink-0"/>
-                    <div class="text-900 text-3xl font-medium mt-3">Survey - INL</div>
+                    <div class="text-900 text-3xl font-medium mt-3">{{apps}} - INL</div>
                     <div>
                         <span class="text-600 font-medium">PT. Industri Nabati Lestari</span>
                     </div>
@@ -120,10 +122,10 @@ const onSubmit = (e) => {
                     <Button label="Sign In" class="w-full p-3 text-xl bg-blue-800 border-none" type="submit" rounded></Button>
                     <Divider class="mt-5"/>
                     <div class="text-center hidden md:block">
-                        <strong>Survey - INL</strong> <span class="mx-1">&copy;</span> 2023 - PT. Industri Nabati Lestari
+                        <strong>{{apps}} - INL</strong> <span class="mx-1">&copy;</span> 2023 - PT. Industri Nabati Lestari
                     </div>
                     <div class="text-center block md:hidden">
-                        <h5>Survey - INL</h5> <span class="mx-1">&copy;</span> 2023 - PT. Industri Nabati Lestari
+                        <h5>{{apps}} - INL</h5> <span class="mx-1">&copy;</span> 2023 - PT. Industri Nabati Lestari
                     </div>
                 </form>
             </div>

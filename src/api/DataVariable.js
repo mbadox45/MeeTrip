@@ -2,233 +2,204 @@ import moment from "moment/moment"
 const date_now = moment().format('DD-MM-YYYY')
 const date_ago =  moment().subtract(10, 'days').format('DD-MM-YYYY');
 
-// List for dropdown
-export const listAkses = [
-    { name: 1, level_akses: 1 },
-    { name: 2, level_akses: 2 },
-    { name: 3, level_akses: 3 },
-    { name: 4, level_akses: 4 },
-    { name: 5, level_akses: 5 },
-    { name: 6, level_akses: 6 },
-    { name: 7, level_akses: 7 },
-    { name: 8, level_akses: 8 },
-    { name: 9, level_akses: 9 },
-    { name: 10, level_akses: 10 },
-];
-export const listRequired = [
-    { name: 'Required', require: 1 },
-    { name: 'Optional', require: 0 },
-];
-export const listCategory = [
-    { name: 'Kategori 1', category_id: 1 },
-    { name: 'Kategori 2', category_id: 2 },
-    { name: 'Kategori 3', category_id: 3 },
-];
-export const typeAnswer = [
-    { name: 'Text (Type: Text)', type: 'text', icon:'/layout/icon/textinput.png' },
-    { name: 'Text (Type: Number)', type: 'number', icon:'/layout/icon/number.png' },
-    { name: 'Checkbox', type: 'checkbox', icon:'/layout/icon/checkbox.png' },
-    { name: 'Radio', type: 'radio', icon:'/layout/icon/radio.png' },
-    { name: 'Dropdown', type: 'dropdown', icon:'/layout/icon/dropdown.png' },
-    { name: 'File', type: 'file', icon:'/layout/icon/file.png' },
-    { name: 'Range', type: 'range', icon:'/layout/icon/range.png' },
-];
+export const APP_NAME = 'MeeTRIP';
 
-// Menu Pertanyaan
-export const settingPertanyaan = [
+// Data Menu
+export const menu_superadmin = [
     {
-        label: 'Options',
-        items: [
-            {
-                label: 'Update',
-                icon: 'pi pi-refresh',
-                command: () => {
-                    toast.add({ severity: 'success', summary: 'Updated', detail: 'Data Updated', life: 3000 });
-                }
-            },
-            {
-                label: 'Delete',
-                icon: 'pi pi-times',
-                command: () => {
-                    toast.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000 });
-                }
-            }
-        ]
+        label: 'Home',
+        items: [{ label: 'Home', icon: 'pi pi-fw pi-home', to: '/home' }]
     },
     {
-        label: 'Navigate',
+        label: 'Main Menu',
         items: [
-            {
-                label: 'Vue Website',
-                icon: 'pi pi-external-link',
-                url: 'https://vuejs.org/'
-            },
-            {
-                label: 'Router',
-                icon: 'pi pi-upload',
-                to: '/fileupload'
-            }
+            { label: 'Pemberi Tugas', icon: 'pi pi-fw pi-tag', to: '/assignor-list' },
+            { label: 'SDM', icon: 'pi pi-fw pi-tag', to: '/sdm-list' },
+            { label: 'Atasan', icon: 'pi pi-fw pi-tag', to: '/atasan-list' },
+            { label: 'Log', icon: 'pi pi-fw pi-history', to: '/log-list' },
         ]
-    }
-];
-
-
-// Breadcrumb Variable
-export const BreadcrumbHome =  { icon: 'pi pi-home', to: '/home' };
-
-// Variable default Forms
-export const formSurvey = {
-    id: 0,
-    desc: '',
-    title: '',
-    from: '',
-    to: '',
-    order_sp:[],
-    value:[],
-    question_order:'',
-}
-export const formUser = {
-    id: 0,
-    name: '',
-    email: '',
-}
-export const formCategory = {
-    id: 0,
-    name: '',
-}
-export const formQuestion = {
-    id: 0,
-    category_id: 0,
-    question: null,
-    type: null,
-    require: null,
-    value:[],
-    desc:[],
-    extra:[],
-}
-
-
-// Data Bodong
-export const listKategori = [
-    {id:1, name:'Kategori 1'},
-    {id:2, name:'Kategori 2'},
-    {id:3, name:'Kategori 3'},
+    },
 ]
-export const listuser = [
-    {id:1, name:'CV Dimas Love You', email:'marketing@dly.co.id'},
-    {id:2, name:'CV Dimas Karya', email:'marketing@cdk.co.id'},
-    {id:3, name:'PT Mencari Cinta Dimas', email:'marketing@mcd.co.id'},
-]
-export const listSurvey = [
-    {id:1, title:'Perkembangan Skill DCD', desc:'Dimas sedang diuji para pakar peneliti UNESCO terkait kemampuan bertanyanya.', from: date_ago, to: date_now, status:true},
-    {id:2, title:'Hasil Skill Dimas', desc:'Hasil pengujian skill Dimas terhadap UNESCO, Erdogan ketar-ketir', from: date_ago, to: date_now, status:false},
-    {id:3, title:'Dimas pembawa perdamaian dunia', desc:'Elite global ketar-ketir melihat skill Dimas', from: date_ago, to: date_now, status:true},
-]
-
-export const FormPreview = [
+export const menu_adminsdm = [
     {
-        id:1,
-        chapter:'Tingkat Kepentingan',
-        categories:[
-            {
-                category_id:1,
-                category:'Misi Dunia',
-                survey:[
+        label: 'Home',
+        items: [{ label: 'Home', icon: 'pi pi-fw pi-home', to: '/home' }]
+    },
+    {
+        label: 'Main Menu',
+        items: [
+            { label: 'Pemberi Tugas', icon: 'pi pi-fw pi-tag', to: '/assignor-list' },
+            { label: 'SDM', icon: 'pi pi-fw pi-tag', to: '/sdm-list' },
+            { label: 'Atasan', icon: 'pi pi-fw pi-tag', to: '/atasan-list' },
+            { label: 'Log', icon: 'pi pi-fw pi-history', to: '/log-list' },
+        ]
+    },
+]
+export const menu_adminga = [
+    {
+        label: 'Home',
+        items: [{ label: 'Home', icon: 'pi pi-fw pi-home', to: '/home' }]
+    },
+    {
+        label: 'Main Menu',
+        items: [
+            { label: 'SPDK', icon: 'pi pi-fw pi-car',
+                items: [
                     {
-                        id:1,
-                        pertanyaan:'Apa yang terjadi jika DMS tidak ada di muka bumi ini?',
-                        type: 'text',
-                        require:1,
-                        jawaban: ''
+                        label: 'BTO - Approve',
+                        icon: 'pi pi-fw pi-bookmark',
+                        to: '/bto-spdk'
                     },
-                    {
-                        id:2,
-                        pertanyaan:'Apa saja yg di berbuat DMS untuk membawa perdamaian dunia?',
-                        type: 'option',
-                        require:0,
-                        jawaban: [
-                            {desc:'Menyelamatkan bumi dari kiamat sugra', value: 1},
-                            {desc:'Menghancurkan dunia dan seisinya', value: 2},
-                        ]
-                    },
-                ],
+                ]
             },
-            {
-                category_id:2,
-                category:'Visi Dunia',
-                survey:[
+            { label: 'Form Request', icon: 'pi pi-fw pi-book',
+                items: [
                     {
-                        id:3,
-                        pertanyaan:'Mengapa DMS harus ada di bumi ini?',
-                        type: 'text',
-                        require:1,
-                        jawaban: ''
+                        label: 'Request - Approve',
+                        icon: 'pi pi-fw pi-bookmark',
+                        to: '/approve-request'
                     },
                     {
-                        id:4,
-                        pertanyaan:'Bagaimana cara DMS bisa menyelamatkan dunia dari perang dunia?',
-                        type: 'option',
-                        require:1,
-                        jawaban: [
-                            {desc:'Kentut berjama`ah', value: 1},
-                            {desc:'Bertanya kepada ahlinya dan melempar tanggung jawabnya ke oranglain', value: 2},
-                            {desc:'Akhlak BUMN', value: 3},
-                        ]
+                        label: 'Request - To Do',
+                        icon: 'pi pi-fw pi-bookmark',
+                        to: '/todo-request'
                     },
-                ],
+                ]
             },
         ]
     },
+]
+export const menu_admincnb = [
     {
-        id:2,
-        chapter:'Tingkat Kepuasan thd. Supplier Lain Sejenis',
-        categories:[
-            {
-                category_id:1,
-                category:'Misi Dunia',
-                survey:[
+        label: 'Home',
+        items: [{ label: 'Home', icon: 'pi pi-fw pi-home', to: '/home' }]
+    },
+    {
+        label: 'Main Menu',
+        items: [
+            { label: 'Payment', icon: 'pi pi-fw pi-money-bill',
+                items: [
                     {
-                        id:1,
-                        pertanyaan:'Apa yang terjadi jika DMS tidak ada di muka bumi ini?',
-                        type: 'text',
-                        require:1,
-                        jawaban: ''
+                        label: 'Not Yet Paid List',
+                        icon: 'pi pi-fw pi-bookmark',
+                        to: '/not-paid'
                     },
                     {
-                        id:2,
-                        pertanyaan:'Apa saja yg di berbuat DMS untuk membawa perdamaian dunia?',
-                        type: 'option',
-                        require:0,
-                        jawaban: [
-                            {desc:'Menyelamatkan bumi dari kiamat sugra', value: 1},
-                            {desc:'Menghancurkan dunia dan seisinya', value: 2},
-                        ]
+                        label: 'Paid List',
+                        icon: 'pi pi-fw pi-bookmark',
+                        to: '/paid'
                     },
-                ],
+                ]
             },
-            {
-                category_id:2,
-                category:'Visi Dunia',
-                survey:[
+            { label: 'SPDK', icon: 'pi pi-fw pi-money-bill',
+                items: [
                     {
-                        id:3,
-                        pertanyaan:'Mengapa DMS harus ada di bumi ini?',
-                        type: 'text',
-                        require:1,
-                        jawaban: ''
+                        label: 'Approval',
+                        icon: 'pi pi-fw pi-check-circle',
+                        to: '/approve-cnb'
                     },
                     {
-                        id:4,
-                        pertanyaan:'Bagaimana cara DMS bisa menyelamatkan dunia dari perang dunia?',
-                        type: 'option',
-                        require:1,
-                        jawaban: [
-                            {desc:'Kentut berjama`ah', value: 1},
-                            {desc:'Bertanya kepada ahlinya dan melempar tanggung jawabnya ke oranglain', value: 2},
-                            {desc:'Akhlak BUMN', value: 3},
-                        ]
+                        label: 'Canceled',
+                        icon: 'pi pi-fw pi-ban',
+                        to: '/canceled-cnb'
                     },
-                ],
+                ]
+            },
+            { label: 'Log', icon: 'pi pi-fw pi-history', to: '/log-list' },
+        ]
+    },
+]
+export const menu_admincs = [
+    {
+        label: 'Home',
+        items: [{ label: 'Home', icon: 'pi pi-fw pi-home', to: '/home' }]
+    },
+    {
+        label: 'Main Menu',
+        items: [
+            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', 
+                items: [
+                    {
+                        label: 'Booked',
+                        icon: 'pi pi-fw pi-calendar',
+                        to: '/booked'
+                    },
+                    {
+                        label: 'Past Booking',
+                        icon: 'pi pi-fw pi-book',
+                        to: '/past-booking'
+                    },
+                    {
+                        label: 'Canceled',
+                        icon: 'pi pi-fw pi-book',
+                        to: '/canceled-booking'
+                    },
+                ]
+            },
+        ]
+    },
+]
+export const menu_user = [
+    {
+        label: 'Home',
+        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/home' }]
+    },
+    {
+        label: 'Main Menu',
+        items: [
+            { label: 'My SPDK', icon: 'pi pi-fw pi-car', to: '/my-spdk' },
+            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', 
+                items: [
+                    {
+                        label: 'Booked',
+                        icon: 'pi pi-fw pi-calendar',
+                        to: '/booked'
+                    },
+                    {
+                        label: 'My Booking',
+                        icon: 'pi pi-fw pi-book',
+                        to: '/my-booking'
+                    },
+                ]
+            },
+        ]
+    },
+]
+export const menu_user_approve = [
+    {
+        label: 'Home',
+        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/home' }]
+    },
+    {
+        label: 'Main Menu',
+        items: [
+            { label: 'SPDK', icon: 'pi pi-fw pi-car',
+                items: [
+                    {
+                        label: 'My SPDK',
+                        icon: 'pi pi-fw pi-briefcase',
+                        to: '/my-spdk'
+                    },
+                    {
+                        label: 'Approval',
+                        icon: 'pi pi-fw pi-bookmark',
+                        to: '/approval'
+                    },
+                ]
+            },
+            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', 
+                items: [
+                    {
+                        label: 'Booked',
+                        icon: 'pi pi-fw pi-calendar',
+                        to: '/booked'
+                    },
+                    {
+                        label: 'My Booking',
+                        icon: 'pi pi-fw pi-book',
+                        to: '/my-booking'
+                    },
+                ]
             },
         ]
     },
