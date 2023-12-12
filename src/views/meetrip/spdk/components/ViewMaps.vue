@@ -1,175 +1,122 @@
 <template>
     <div>
-      <div ref="mapDiv" style="width: 100%; height: 500px;"></div>
-      <div class="p-fluid">
-        <p>Current Address: {{ currentAddress }}</p>
-      </div>
+        <div ref="mapDiv" style="width: 100%; height: 500px;"></div>
+        <div class="p-fluid">
+            <p>Current Address: {{ currentAddress }}</p>
+        </div>
     </div>
-  </template>
+</template>
   
-  <script setup>
-  import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
-  import { Loader } from '@googlemaps/js-api-loader';
-  import axios from 'axios';
-  import { useGeolocation } from './useGeolocation';
-  
-  const GOOGLE_MAPS_API_KEY = 'AIzaSyDPjOjHUhjHkSMDAyD4Of6yhvV6ZwwBojM';
-  const loaders = new Loader({ apiKey: GOOGLE_MAPS_API_KEY });
-  const mapDiv = ref(null);
-  let map = ref(null);
-  let currMarker = null;
-  let clickListener = null;
-  
-  const { coords } = useGeolocation();
-  const currPos = computed(() => ({
-    lat: coords.value.latitude,
-    lng: coords.value.longitude,
-  }));
-  
-  // Store the addresses
-  const currentAddress = ref(null);
-  
-  // Autocomplete variables
-  const searchQuery = ref('');
-  const searchResults = ref([]);
-  
-  onMounted(() => {
-    onLoader();
-  });
-  
-  onUnmounted(() => {
-    if (clickListener) {
-      clickListener.remove();
-    }
-  });
-  
-  const onLoader = async () => {
-    await loaders.load();
-    map.value = new google.maps.Map(mapDiv.value, {
-      center: currPos.value,
-      zoom: 7,
-    });
-  
-    // Add a marker for the current position
-    currMarker = new google.maps.Marker({
-      position: currPos.value,
-      map: map.value,
-      title: 'Current Position',
-    });
-  
-    // Reverse geocode the current position
-    reverseGeocode(currPos.value, currentAddress);
-  
-    // Listen for click events on the map
-    clickListener = map.value.addListener('click', ({ latLng }) => {
-      // Clear existing markers
-      clearMarkers();
-  
-      // Add a new marker for the clicked position
-      const clickedMarker = new google.maps.Marker({
-        position: latLng,
-        map: map.value,
-        title: 'Clicked Position',
-      });
-  
-      // Reverse geocode the clicked position
-      reverseGeocode({ lat: latLng.lat(), lng: latLng.lng() }, currentAddress);
-    });
-  };
-  
-  // Function to perform reverse geocoding
-  const reverseGeocode = async (position, addressRef) => {
-    try {
-      const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
-        params: {
-          latlng: `${position.lat},${position.lng}`,
-          key: GOOGLE_MAPS_API_KEY,
-        },
-      });
-  
-      const results = response.data.results;
-      if (results && results.length > 0) {
-        addressRef.value = results[0].formatted_address;
-        // console.log(results)
-      } else {
-        addressRef.value = 'Address not found';
-      }
-    } catch (error) {
-      console.error('Error fetching address:', error.message);
-    }
-  };
-  
-  // Function to clear markers from the map
-  const clearMarkers = () => {
-    if (map.value) {
-      map.value.markers.forEach((marker) => {
-        marker.setMap(null);
-      });
-    }
-  };
-  
-  // Function to handle input in the search box
-  const onSearchInput = async () => {
-    try {
-      const response = await axios.get('http://localhost:3031/v1/api/maps/place_predictions', {
-        params: {
-          input: searchQuery.value,
-        //   input: 'monas',
-          key: GOOGLE_MAPS_API_KEY,
-        },
-      });
+<script setup>
+    import { ref, onMounted, onUnmounted, watch, computed, defineProps } from 'vue';
+    import { Loader } from '@googlemaps/js-api-loader';
+    import axios from 'axios';
 
-      const data = response.data.data.predictions;
-      const list = [];
-      for (let i = 0; i < data.length; i++) {
-        list[i] = {
-            description: data[i].description,
-            place_id: data[i].place_id,
-            main_text: data[i].structured_formatting.main_text,
-        }
-      }
-  
-      searchResults.value = list;
-      console,log(searchResults.value)
-    } catch (error) {
-      console.error('Error fetching search results:', error.message);
-    }
-  };
-  
-  // Function to handle place selection from the search results
-  const onPlaceSelect = (place) => {
-    // Clear existing markers
-    clearMarkers();
-  
-    // Fetch details for the selected place
-    getPlaceDetails(place.place_id);
-  };
-  
-  // Function to get details for a place using its place_id
-  const getPlaceDetails = async (placeId) => {
-    try {
-      const response = await axios.get('https://maps.googleapis.com/maps/api/place/details/json', {
-        params: {
-          place_id: placeId,
-          key: GOOGLE_MAPS_API_KEY,
+    // Components
+    import { GOOGLE_MAPS_API_KEYS } from '@/api/env'
+    import { useGeolocation } from './useGeolocation';
+
+    const props = defineProps({
+        data_dialog:{
+            type:Array
         },
-      });
-  
-      const place = response.data.result;
-      if (place) {
-        // Add a marker for the selected place
-        const selectedMarker = new google.maps.Marker({
-          position: place.geometry.location,
-          map: map.value,
-          title: place.name,
+    });
+    
+    const GOOGLE_MAPS_API_KEY = GOOGLE_MAPS_API_KEYS;
+    const loaders = new Loader({ apiKey: GOOGLE_MAPS_API_KEY });
+    const mapDiv = ref(null);
+    let map = ref(null);
+    let currMarker = null;
+    const load_data = props.data_dialog;
+    
+    const { coords } = useGeolocation();
+    const currPos = computed(() => ({
+        lat: coords.value.latitude,
+        lng: coords.value.longitude,
+    }));
+    
+    // Store the addresses
+    const currentAddress = ref(null);
+    
+    // Autocomplete variables
+    const searchQuery = ref('');
+    const searchResults = ref([]);
+    
+    onMounted(() => {
+        onLoader();
+    });
+    
+    const onLoader = async () => {
+        await loaders.load();
+        const id_place = await getLongLat(load_data[0].locate.place_id)
+        map.value = new google.maps.Map(mapDiv.value, {
+            center: id_place,
+            zoom: 5,
         });
-  
-        // Reverse geocode the selected place
-        reverseGeocode(place.geometry.location, currentAddress);
-      }
-    } catch (error) {
-      console.error('Error fetching place details:', error.message);
+      
+        // Add a marker for the current position
+        currMarker = new google.maps.Marker({
+            position: currPos.value,
+            map: map.value,
+            title: 'Current Position',
+        });
+
+
+        for (let i = 0; i < load_data.length; i++) {
+            const place = load_data[i].locate.place_id
+            const longlat = await getLongLat(place)
+            console.log(longlat)
+            new google.maps.Marker({
+                position: longlat,
+                map: map.value,
+                title: 'Current Position',
+            });
+        }
+        // Reverse geocode the current position
+        reverseGeocode(currPos.value, currentAddress);
+    };
+
+    const getLongLat = async(place) => {
+        const response = await axios.get('http://localhost:3031/v1/api/maps/by_place_id', {
+            params: {
+                place_id: place,
+                fields: 'geometry',
+                key: GOOGLE_MAPS_API_KEY,
+            },
+        });
+        const result = response.data.data.result;
+        return result.geometry.location;
     }
-  };
-  </script>
+    
+    // Function to perform reverse geocoding
+    const reverseGeocode = async (position, addressRef) => {
+        try {
+            const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+                params: {
+                  latlng: `${position.lat},${position.lng}`,
+                  key: GOOGLE_MAPS_API_KEY,
+                },
+            });
+        
+            const results = response.data.results;
+            if (results && results.length > 0) {
+                addressRef.value = results[0].formatted_address;
+              // console.log(results)
+            } else {
+              addressRef.value = 'Address not found';
+            }
+        } catch (error) {
+            console.error('Error fetching address:', error.message);
+        }
+    };
+    
+    // Function to clear markers from the map
+    const clearMarkers = () => {
+        if (map.value) {
+            map.value.markers.forEach((marker) => {
+              marker.setMap(null);
+            });
+        }
+    };
+</script>
   

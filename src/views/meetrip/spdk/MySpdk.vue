@@ -107,12 +107,13 @@
 
     // Dialog Function
     const detailData = async(data, status) => {
-        dialogs.value = true;
+        // dialogs.value = true;
         statusRequest.value = status;
         if (status === 'detail') {
             titledialogs.value = `<span class="font-semibold">VIEW DETAIL</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor}`;
         } else if (status === 'add') {
             titledialogs.value = `<span class="font-semibold">NEW BTO</span>`;
+            router.push('/form-bto');
         } else if (status === 'edit') {
             titledialogs.value = `<span class="font-semibold text-gray-500">EDIT BTO</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor}`;
         } else if (status === 'approve') {
