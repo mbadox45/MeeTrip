@@ -110,6 +110,7 @@
             }
         
             list_start_location.value = list;
+            console.log(start_location.value)
         } catch (error) {
             console.error('Error fetching search results:', error.message);
         }
