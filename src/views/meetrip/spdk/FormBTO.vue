@@ -8,19 +8,28 @@
 
     // API
     import { kendaraan, down_payment } from '@/api/Databodong';
+    import { GOOGLE_MAPS_API_KEYS } from '@/api/env';
     import UserService from '@/api/UserService'
+    import User_SpdkFormService from '@/api/user/SpdkFormService'
 
     // Variable
     const list_atasan = ref([]);
+    const lampiran = ref();
     const payload = ref(JSON.parse(localStorage.getItem('payload')));
-    const form = ref({id:null, atasan_id:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, lokasi:[], rombongan:'', uang_panjar: null})
+    const form = ref({id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]})
     const kendaraan_list = ref(kendaraan);
     const dp_list = ref(down_payment);
     const visible = ref(false);
-    const start_location = ref('')
+    const location = ref([
+        {locate:null, list_location:[], placeholder:'Start Location'}, 
+        {locate:null, list_location:[], placeholder:'Destination Location'}
+    ])
+    const start_location = ref(null)
+    const destination_location = ref(null)
     const list_start_location = ref([])
+    const list_destination_location = ref([])
 
-    const GOOGLE_MAPS_API_KEY = 'AIzaSyDPjOjHUhjHkSMDAyD4Of6yhvV6ZwwBojM';
+    const GOOGLE_MAPS_API_KEY = GOOGLE_MAPS_API_KEYS;
 
 
     const load_data = async () => {
@@ -46,16 +55,18 @@
     });
 
     const reset_form = () => {
-        form.value = {
-            id:null, 
-            atasan_id:null, 
-            keperluan:'', 
-            tgl_berangkat:null, 
-            tgl_kembali:null, 
-            barang:null, 
-            rombongan:''
-        }
+        form.value = {id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]}
     }
+
+    const addsForm = () => {
+        // tot_answare.value++;
+        location.value.push({locate:null, list_location:[], placeholder:'Destination Location'});
+    };
+
+    const removeForm = (index) => {
+        location.value.splice(index, 1); // Remove the form at the specified index
+        // console.log(index)
+    };
 
     const loadUser = async() => {
         try {
@@ -86,14 +97,30 @@
     // Show Dialog Maps
     const viewMap = () => {
         visible.value = true;
+        console.log(location.value);
+    }
+
+    // Get Longitude Latitude By Place_id
+    const getLongLat = async(place) => {
+        const response = await axios.get('http://localhost:3031/v1/api/maps/by_place_id', {
+            params: {
+                place_id: place,
+                fields: 'geometry',
+                key: GOOGLE_MAPS_API_KEY,
+            },
+        });
+        const result = response.data.data.result;
+        return result.geometry.location;
     }
 
     // Search Location By GMaps API
-    const onSearchInput = async () => {
+    const onSearchInput = async (index) => {
+    // const onSearchInput = async () => {
         try {
             const response = await axios.get('http://localhost:3031/v1/api/maps/place_predictions', {
                 params: {
-                input: start_location.value,
+                input: location.value[index].locate,
+                // input: start_location.value,
                 //   input: 'monas',
                 key: GOOGLE_MAPS_API_KEY,
                 },
@@ -108,18 +135,62 @@
                     main_text: data[i].structured_formatting.main_text,
                 }
             }
-        
-            list_start_location.value = list;
-            console.log(start_location.value)
+
+            location.value[index].list_location = list;
         } catch (error) {
             console.error('Error fetching search results:', error.message);
         }
     };
 
+    const customBase64Uploader = async (event) => {
+        const file = event.files[0];
+        const reader = new FileReader();
+        console.log(file)
+        form.value.lampiran = file.objectURL;
+        let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+
+        reader.readAsDataURL(blob);
+
+        reader.onloadend = function () {
+            const base64data = reader.result;
+        };
+    };
+
     // Post Data to BE_API
     const postData = async (ket) => {
-        form.value.lama_hari = perhitungan_waktu(form.value.tgl_berangkat, form.value.jam_pergi, form.value.tgl_kembali, form.value.jam_sampai) - 1
-        console.log(form.value.lama_hari)
+        const loc = location.value;
+        const gets = await getLongLat(loc[0].locate.place_id)
+        form.value.start_latitude = Number(gets.lat);
+        form.value.start_longitude = Number(gets.lng);
+
+        let formData = new FormData();
+        formData.append('atasan_id', form.value.atasan_id);
+        formData.append('keperluan', form.value.keperluan);
+        formData.append('tgl_berangkat', form.value.tgl_berangkat);
+        formData.append('tgl_kembali', form.value.tgl_kembali);
+        formData.append('jam_pergi', form.value.jam_pergi);
+        formData.append('jam_sampai', form.value.jam_sampai);
+        formData.append('barang', form.value.barang);
+        formData.append('kendaraan', form.value.kendaraan);
+        formData.append('rombongan', form.value.rombongan);
+        formData.append('uang_panjar', form.value.uang_panjar);
+        formData.append('start_latitude', form.value.start_latitude);
+        formData.append('start_longitude', form.value.start_longitude);
+        formData.append('lampiran', form.value.lampiran);
+        
+        for (let i = 1; i < loc.length; i++) {
+            const locate = await getLongLat(loc[i].locate.place_id);
+            // console.log(locate)
+            form.value.latitude[i-1] = locate.lat;
+            form.value.longitude[i-1] = locate.lng;
+            formData.append(`latitude[${i-1}]`, form.value.latitude);
+            formData.append(`longitude[${i-1}]`, form.value.longitude);
+        }
+        form.value.lama_hari = perhitungan_waktu(form.value.tgl_berangkat, form.value.jam_pergi, form.value.tgl_kembali, form.value.jam_sampai)+1
+        console.log(form.value)
+        formData.append('lama_hari', form.value.lama_hari);
+        const response = await User_SpdkFormService.postAddMySPDK(formData)
+        console.log(response);
     }
 
 </script>
@@ -132,7 +203,7 @@
                     <span class="font-bold white-space-nowrap">View Maps</span>
                 </div>
             </template>
-            <view-maps/>
+            <view-maps :data_dialog="location"/>
         </Dialog>
         <div class="flex align-items-center justify-content-end md:justify-content-between mb-5 px-2">
             <div class="">
@@ -154,7 +225,7 @@
                                 <path d="M1 1a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h.5a.5.5 0 0 0 .5-.5.5.5 0 0 1 1 0 .5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5.5.5 0 0 1 1 0 .5.5 0 0 0 .5.5h.5a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H6.707L6 1.293A1 1 0 0 0 5.293 1H1Zm0 1h4.293L6 2.707A1 1 0 0 0 6.707 3H15v10h-.085a1.5 1.5 0 0 0-2.4-.63C11.885 11.223 10.554 10 8 10c-2.555 0-3.886 1.224-4.514 2.37a1.5 1.5 0 0 0-2.4.63H1V2Z"/>
                             </svg>
                         </span>
-                        <Dropdown v-model="form.atasan_id" :options="list_atasan" filter optionLabel="name" optionValue="id" placeholder="Choose a assignor" class="w-full">e> -->
+                        <Dropdown v-model="form.atasan_id" :options="list_atasan" filter optionLabel="name" optionValue="id" placeholder="Choose a assignor" class="w-full"> 
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
                                     <Avatar icon="pi pi-user" style="background-color: #E59866 color: #ffffff" class="mr-2" shape="circle" />
@@ -167,19 +238,14 @@
                 <div class="col-12 md:col-12">
                     <p class="text-lg font-semibold text-gray-500">ROUTE TRIP <small class="border-1 py-1 px-2 border-round ml-3 text-sm text-orange-500 cursor-pointer hover:text-teal-500" @click="viewMap()"><i class="pi pi-map mr-2"></i> View Maps</small></p>
                     <div class="border-2 border-round border-bluegray-200 p-3">
-                        <div class="p-inputgroup">
-                            <span class="p-inputgroup-addon bg-pink-500 text-white">
+                        <div :class="`p-inputgroup ${index > 0 ? 'mt-3':'mt-0'}`" v-for="(forms, index) in location" :key="index">
+                            <span :class="`p-inputgroup-addon ${index > 0 ? 'bg-pink-500' : 'bg-cyan-500'} text-white`">
                                 <i class="pi pi-map-marker"></i>
                             </span>
-                            <AutoComplete v-model="start_location" :suggestions="list_start_location" @complete="onSearchInput" class="w-full" optionLabel="description" placeholder="Pick up location"/>
-                        </div>
-                        <div class="p-inputgroup mt-3">
-                            <span class="p-inputgroup-addon bg-cyan-500 text-white">
-                                <i class="pi pi-map-marker"></i>
-                            </span>
-                            <AutoComplete class="w-full" optionLabel="description" placeholder="Destination location"/>
-                            <Button icon="pi pi-plus" severity="info"></Button>
-                            <Button icon="pi pi-minus" severity="warning"></Button>
+                            <AutoComplete v-model="forms.locate" :suggestions="forms.list_location" @complete="onSearchInput(index)" class="w-full" optionLabel="description" :placeholder="`${forms.placeholder} ${index > 1 ? index : ''}`" />
+
+                            <Button icon="pi pi-plus" severity="secondary" v-show="index > 0" @click="addsForm"></Button>
+                            <Button icon="pi pi-minus" severity="warning" v-show="index > 1" @click="removeForm(index)"></Button>
                         </div>
                     </div>
                 </div>
@@ -231,7 +297,7 @@
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-briefcase"></i>
                         </span>
-                        <InputText v-model="form.jam_sampai" placeholder="Exp: clothes, files, laptop, etc.."/>
+                        <InputText v-model="form.barang" placeholder="Exp: clothes, files, laptop, etc.."/>
                     </div>
                 </div>
                 <div class="col-12 md:col-4 p-fluid">
@@ -240,7 +306,7 @@
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-users"></i>
                         </span>
-                        <InputText v-model="form.jam_sampai" placeholder="Exp: Rombongan komunitas"/>
+                        <InputText v-model="form.rombongan" placeholder="Exp: Rombongan komunitas"/>
                     </div>
                 </div>
                 <div class="col-12 md:col-4 p-fluid">
@@ -249,7 +315,7 @@
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-car"></i>
                         </span>
-                        <Dropdown v-model="form.kendaraan" :options="kendaraan_list" optionLabel="name" optionValue="name" placeholder="Select a Transportation" class="">
+                        <Dropdown v-model="form.kendaraan" :options="kendaraan_list" optionLabel="name" optionValue="kendaraan" placeholder="Select a Transportation" class="">
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
                                     <span v-html="slotProps.option.icon"></span>
@@ -276,7 +342,7 @@
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-bookmark"></i>
                         </span>
-                        <Dropdown v-model="form.uang_panjar" :options="dp_list" optionLabel="name" optionValue="value" placeholder="Select a Transportation" class="">
+                        <Dropdown v-model="form.uang_panjar" :options="dp_list" optionLabel="name" optionValue="uang_panjar" placeholder="Select a Transportation" class="">
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
                                     <span v-html="slotProps.option.icon"></span>
@@ -292,7 +358,7 @@
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-file-import"></i>
                         </span>
-                        <InputText type="file" v-model="form.jam_sampai" placeholder="Exp: Rombongan komunitas"/>
+                        <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" @upload="customBase64Uploader" />
                     </div>
                 </div>
                 <div class="col-12 md:col-6">
@@ -307,6 +373,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>   
     </form>
 </template>

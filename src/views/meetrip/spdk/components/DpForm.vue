@@ -37,19 +37,7 @@
 
     const load_data = async () => {
         loadUser();
-        if (statusData == 'add') {
-            reset_form();
-        } else {
-            form.value = {
-                id:null, 
-                atasan_id:null, 
-                keperluan:'', 
-                tgl_berangkat:null, 
-                tgl_kembali:null, 
-                barang:null, 
-                rombongan:''
-            };
-        }
+        reset_form();
     }
 
     const perhitungan_waktu = (t_berangkat, j_berangkat, t_sampai, j_sampai) => {
@@ -127,7 +115,7 @@
             <div class="col-12 md:col-9">
                 <div class="flex align-items-center gap-3 mr-auto">
                     <Avatar image="/layout/meetrip.png" size="large" />
-                    <strong class="text-3xl" v-html="titleData"></strong>
+                    <strong class="text-3xl">Form Down Payment</strong>
                 </div>
                 <Divider/>
             </div>

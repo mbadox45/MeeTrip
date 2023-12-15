@@ -44,6 +44,15 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/dp-bto',
+                    name: 'dp-bto',
+                    component: () => import('@/views/meetrip/spdk/DPSpdk.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        user:true,
+                    }
+                },
+                {
                     path: '/booked',
                     name: 'booked',
                     component: () => import('@/views/meetrip/meeting/Booked.vue'),

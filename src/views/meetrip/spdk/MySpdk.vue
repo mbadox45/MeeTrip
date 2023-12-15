@@ -5,16 +5,11 @@
     import { useToast } from 'primevue/usetoast';
 
     // API
-    // import RequestService from '@/api/RequestService.js';
+    import User_SpdkFormService from '@/api/user/SpdkFormService.js';
     import { URL_WEB } from '@/api/env';
 
     
     // Component
-    import NewBto from './components/NewBto.vue';
-    import EditBto from './components/EditBto.vue';
-    import DpForm from './components/DpForm.vue';
-    // import DeclineRequest from './components/DeclineRequest.vue';
-    // import FormsRequest from './components/FormsRequest.vue';
 
     const router = useRouter();
 
@@ -73,8 +68,17 @@
     const aksi = async () => {
         // loadingTable.value = 'Loading'
         try {
+            const response = await User_SpdkFormService.getMySPDK();
+            const data = response.data.data
             const list = [];
-            request_data.value = [list];
+            for (let i = 0; i < data.length; i++) {
+                list[i] = {
+                    submit_date: moment(data[i].created_at).format('DD MMMM YYYY'),
+                    info: data[i].info,
+                    destination: data[i].destination,
+                };
+            }
+            request_data.value = list;
         } catch (error) {
             loadingTable2.value = false;
             request_data.value = []
@@ -107,17 +111,19 @@
 
     // Dialog Function
     const detailData = async(data, status) => {
-        dialogs.value = true;
+        // dialogs.value = true;
         statusRequest.value = status;
         if (status === 'detail') {
             titledialogs.value = `<span class="font-semibold">VIEW DETAIL</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor}`;
         } else if (status === 'add') {
             titledialogs.value = `<span class="font-semibold">NEW BTO</span>`;
+            router.push('/form-bto');
         } else if (status === 'edit') {
             titledialogs.value = `<span class="font-semibold text-gray-500">EDIT BTO</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor}`;
         } else if (status === 'approve') {
             titledialogs.value = `<span class="font-semibold text-cyan-500">APPROVE REQUEST</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor}`;
         } else if (status === 'dp') {
+            router.push('/dp-bto');
             titledialogs.value = `<span class="font-semibold text-cyan-500">DOWN PAYMENT FORM</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor}`;
         } else {
             titledialogs.value = `<span class="font-semibold text-red-500">DECLINE REQUEST</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor}`;
@@ -153,15 +159,6 @@
 <template>
     <div class="grid align-items-center">
         <Toast/>
-        <Sidebar v-model:visible="dialogs" position="full" :pt="{
-            header: {
-                style: 'display: none'
-            }
-        }">
-            <new-bto :data_dialog="selectedRequest" :title="titledialogs" v-if="statusRequest == 'add'" :status="statusRequest" @submit="actionDialog"/>
-            <edit-bto :data_dialog="selectedRequest" :title="titledialogs" v-else-if="statusRequest == 'edit'" :status="statusRequest" @submit="actionDialog"/>
-            <dp-form :data_dialog="selectedRequest" :title="titledialogs" v-else :status="statusRequest" @submit="actionDialog"/>
-        </Sidebar>
         <div class="col-12 md:col-12">
             <div class="flex align-items-center justify-content-end md:justify-content-between">
                 <div class="">
@@ -186,11 +183,19 @@
                 </div>
                 <Divider/>
                 <ContextMenu ref="cm" :model="menuModel" />
-                <DataTable :value="request_data" paginator :rows="10" :rowClass="rowClass" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" tableStyle="min-width: 50rem">
+                <DataTable :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" tableStyle="min-width: 50rem">
                     <template #empty><p class="text-center"> Data not found. </p></template>
-                    <Column field="date" header="Submit Date" class="min-w-10"></Column>
+                    <Column field="submit_date" header="Submit Date" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.submit_date }}
+                        </template>
+                    </Column>
                     <Column field="destination" header="Destination" class="min-w-10"></Column>
-                    <Column field="keterangan" header="Status" class="min-w-10"></Column>
+                    <Column field="info" header="Status" class="min-w-10">
+                        <template #body="{ data }">
+                            {{ data.info.toUpperCase() }}
+                        </template>
+                    </Column>
                 </DataTable>
             </div>
         </div>
