@@ -20,36 +20,70 @@ const router = createRouter({
                         superadmin:true,
                         adminsdm:true,
                         adminga:true,
-                        admincnb:true,
-                        admincs:true,
                         user:true,
                     }
                 },
+                // Roles User
                 {
                     path: '/my-spdk',
                     name: 'my-spdk',
-                    component: () => import('@/views/meetrip/spdk/MySpdk.vue'),
+                    component: () => import('@/views/meetrip/spdk/user/MySpdk.vue'),
                     meta:{
                         requiresAuth: true,
                         user:true,
+                        adminga:true,
+                        adminsdm:true,
                     }
                 },
                 {
                     path: '/form-bto',
                     name: 'form-bto',
-                    component: () => import('@/views/meetrip/spdk/FormBTO.vue'),
+                    component: () => import('@/views/meetrip/spdk/user/FormBTO.vue'),
                     meta:{
                         requiresAuth: true,
+                        adminga:true,
+                        adminsdm:true,
                         user:true,
                     }
                 },
                 {
-                    path: '/dp-bto',
+                    path: '/dp-bto/:id',
                     name: 'dp-bto',
-                    component: () => import('@/views/meetrip/spdk/DPSpdk.vue'),
+                    component: () => import('@/views/meetrip/spdk/user/DPSpdk.vue'),
                     meta:{
                         requiresAuth: true,
+                        adminga:true,
                         user:true,
+                    }
+                },
+                {
+                    path: '/bte/:id',
+                    name: 'bte',
+                    component: () => import('@/views/meetrip/spdk/user/BteSpdk.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        adminga:true,
+                        user:true,
+                    }
+                },
+                {
+                    path: '/check-point/:id',
+                    name: 'check-point',
+                    component: () => import('@/views/meetrip/spdk/user/CheckPoint.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        adminga:true,
+                        adminsdm:true,
+                        user:true,
+                    }
+                },
+                {
+                    path: '/room',
+                    name: 'room',
+                    component: () => import('@/views/meetrip/meeting/Room.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        adminga:true,
                     }
                 },
                 {
@@ -59,6 +93,8 @@ const router = createRouter({
                     meta:{
                         requiresAuth: true,
                         user:true,
+                        adminga:true,
+                        adminsdm:true,
                     }
                 },
                 {
@@ -68,24 +104,73 @@ const router = createRouter({
                     meta:{
                         requiresAuth: true,
                         user:true,
+                        adminga:true,
+                        adminsdm:true,
+                    }
+                },
+
+                // Roles Admin GA
+                {
+                    path: '/bto-spdk',
+                    name: 'bto-spdk',
+                    component: () => import('@/views/meetrip/spdk/admin_ga/BTOSpdk.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        superadmin:true,
+                        adminsdm:true,
+                        adminga:true,
                     }
                 },
                 {
-                    path: '/test-maps',
-                    name: 'test-maps',
-                    component: () => import('@/views/meetrip/spdk/TestMaps.vue'),
+                    path: '/surat-jalan',
+                    name: 'surat-jalan',
+                    component: () => import('@/views/meetrip/spdk/admin_ga/BTOSpdk.vue'),
                     meta:{
                         requiresAuth: true,
-                        user:true,
+                        superadmin:true,
+                        adminga:true,
                     }
                 },
                 {
-                    path: '/test-maps2',
-                    name: 'test-maps2',
-                    component: () => import('@/views/meetrip/spdk/TestMaps2.vue'),
+                    path: '/bte-spdk',
+                    name: 'bte-spdk',
+                    component: () => import('@/views/meetrip/spdk/admin_ga/BTESpdk.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        superadmin:true,
+                        adminsdm:true,
+                        adminga:true,
+                    }
+                },
+
+                // Roles Pemberi Tugas
+                // {
+                //     path: '/approval',
+                //     name: 'approval',
+                //     component: () => import('@/views/meetrip/spdk/user/ApproveSpdk.vue'),
+                //     meta:{
+                //         requiresAuth: true,
+                //         superadmin:true,
+                //     }
+                // },
+                {
+                    path: '/approval-assignor',
+                    name: 'approval-assignor',
+                    component: () => import('@/views/meetrip/spdk/user/assignor_or_superior/AssignorSpdk.vue'),
                     meta:{
                         requiresAuth: true,
                         user:true,
+                        // superadmin:true,
+                    }
+                },
+                {
+                    path: '/approval-superior',
+                    name: 'approval-superior',
+                    component: () => import('@/views/meetrip/spdk/user/assignor_or_superior/SuperiorSpdk.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        user:true,
+                        // superadmin:true,
                     }
                 },
             ]
@@ -96,6 +181,10 @@ const router = createRouter({
             component: () => import('@/views/meetrip/sign/SignOut.vue'),
             meta:{
                 requiresAuth: true,
+                user:true,
+                superadmin:true,
+                adminsdm:true,
+                adminga:true,
                 user:true,
                 // admin:true,
             }

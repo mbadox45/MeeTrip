@@ -55,31 +55,28 @@ const loadParams = async () => {
                         const load_akses = response_akses.data;
                         const data_akses = load_akses.data;
                         const index = data_akses.find(a => a.user_id === Number(idUser.value))
+                        console.log(index);
                         if (!index) {
                             console.log('No Access');
                             window.location.replace(`${URL_WEB}`);
                         } else {
                             let roles;
-                            if (data.grade == 7) {
+                            if (index.level_akses == 10) {
                                 roles = 'superadmin';
-                            } else if (data.grade == 9) {
-                                roles = 'adminsdm';
-                            } else if (data.grade == 10) {
+                            } else if (index.level_akses == 9) {
                                 roles = 'adminga';
-                            } else if (data.grade == 11) {
-                                roles = 'admincnb';
-                            } else if (data.grade == 12) {
-                                roles = 'admincs';
+                            } else if (index.level_akses == 5) {
+                                roles = 'adminsdm';
                             } else {
                                 roles = 'user';
                             }
 
                             // Kondisi department menggunakan number atau string
-                            if (data.department !== null) {
-                                dept.value = data.department.department;
-                            } else {
-                                dept.value = data.divisi;
-                            }
+                            // if (data.department !== null) {
+                            //     dept.value = data.department.department;
+                            // } else {
+                            //     dept.value = data.divisi;
+                            // }
 
                             const pushdata = {
                                 id :  idUser.value,
@@ -90,6 +87,7 @@ const loadParams = async () => {
                                 department : data.department,
                                 division : data.division,
                                 grade : data.grade,
+                                level : index.level_akses,
                                 type: roles,
                             }
                             console.log(pushdata);

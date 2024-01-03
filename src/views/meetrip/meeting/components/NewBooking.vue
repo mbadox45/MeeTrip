@@ -5,8 +5,9 @@
     // Components
 
     // API
-    // import {listOffice} from '@/api/DataVariable';
+    import Meeting_BookingService from '@/api/meeting/BookingService';
     import UserService from '@/api/UserService'
+    import { URL_WEB, URL_API } from '@/api/env';
 
     // Variable
     const props = defineProps({
@@ -28,7 +29,10 @@
     const tools = ref({snack:true, minuman:true, siang:true, malam:true})
     const disable_snack = ref(true);
     const tools_form = ref({snack:'', minuman:'', siang:'', malam:''})
-    const form = ref({id:null, topik:'', tanggal:'', start:'', end:'', room:null, tools:['zoom','sound'], partisipan:''})
+    const form = ref({id:null, purpose:'', date:'', start_time:'', end_time:'', room_id:null, tools:['zoom','sound'], peserta:'', snack:'0', minuman:'0', siang: '0', malam:'0'})
+    const room_list = ref([]);
+    const images = ref(null);
+    const date_now = ref(moment(new Date).format('YYYY-MM-DD'))
 
     // Emit from ApproveRequest.vue
     const emit = defineEmits(['submit'])
@@ -36,11 +40,10 @@
     const load_data = async () => {
         if (statusData == 'add') {
             reset_form();
+            await room_load()
         } else {
-            form.value = {
-                id:null, 
-                topik:'', tanggal:'', start:'', end:'', room:null, tools:['zoom','sound'], partisipan:''
-            };
+            await room_load()
+            load_edit()
         }
     }
 
@@ -48,9 +51,77 @@
         load_data()
     });
 
+    const load_edit = () => {
+        form.value.id= datas.id;
+        form.value.purpose= datas.purpose;
+        form.value.date= datas.date;
+        form.value.start_time= datas.start_time;
+        form.value.end_time= datas.end_time; 
+        form.value.room_id= datas.room_id;
+        form.value.peserta= datas.peserta; 
+        form.value.tools = [];
+        // Zoom
+        if (datas.zoom == 'zoom') {
+            form.value.tools.push('zoom')
+        }
+        // Sound
+        if (datas.sound == 'sound') {
+            form.value.tools.push('sound')
+        }
+        // Snack
+        if (datas.snack != "0") {
+            form.value.snack = datas.snack; 
+            tools_form.value.snack = datas.snack
+            disable_snack.value = false
+            form.value.tools.push('snack')
+        } 
+        // Minuman
+        if (datas.minuman != "0") {
+            form.value.minuman = datas.minuman; 
+            tools_form.value.minuman = datas.minuman
+            form.value.tools.push('minuman')
+        }
+        // Makan Siang
+        if (datas.siang != "0") {
+            form.value.siang = datas.siang; 
+            tools_form.value.siang = datas.siang
+            form.value.tools.push('siang')
+        }
+        // Makan Malam
+        if (datas.malam != "0") {
+            form.value.malam = datas.malam; 
+            tools_form.value.malam = datas.malam
+            form.value.tools.push('malam')
+        }
+        rooms()
+    }
+
+    const room_load = async() => {
+        const response = await Meeting_BookingService.getRoom()
+        const load = response.data.data;
+        const list = [];
+        for (let i = 0; i < load.length; i++) {
+            list[i] = {
+                capacity:load[i].capacity,
+                description:load[i].description,
+                foto_room:URL_API+'uploads/room/'+load[i].foto_room,
+                id:load[i].id,
+                name:load[i].name,
+            }
+        }
+        room_list.value = list;
+        
+    }
+
+    // View Image
+    const rooms = () => {
+        const data = room_list.value.filter(item => item.id === form.value.room_id);
+        images.value = data[0].foto_room
+    }
+
     const reset_form = () => {
         form.value = {
-            topik:'', tanggal:'', start:'', end:'', room:null, tools:['zoom','sound'], partisipan:''
+            purpose:'', date:'', start_time:'', end_time:'', room_id:null, tools:['zoom','sound'], peserta:'', snack:'0', minuman:'0', siang: '0', malam:'0'
         }
         tools.value = {
             snack:true, minuman:true, siang:true, malam:true
@@ -74,7 +145,7 @@
 
     const snackDisable = () => {
         
-        if (form.value.start != '' && form.value.end != '') {
+        if (form.value.start_time != '' && form.value.end_time != '') {
             disable_snack.value = false;
         } else {
             disable_snack.value = true;
@@ -83,10 +154,54 @@
 
     const postData = async (ket) => {
         if (ket == 'save') {
-            // try {
-            // } catch (error) {
-            //     emit('submit','danger')
-            // }
+            try {
+                // get tools array
+                if (form.value.tools.indexOf('zoom') >= 0 ) {
+                    form.value.zoom = form.value.tools[form.value.tools.indexOf('zoom')]
+                } else {
+                    form.value.zoom = ""
+                }
+                if (form.value.tools.indexOf('sound') >= 0) {
+                    form.value.sound = form.value.tools[form.value.tools.indexOf('sound')]
+                } else {
+                    form.value.sound = ""
+                }
+
+                // post data
+                const post = {
+                    snack : tools_form.value.snack || form.value.snack,
+                    minuman : tools_form.value.minuman || form.value.minuman,
+                    malam : tools_form.value.malam || form.value.malam,
+                    siang : tools_form.value.siang || form.value.siang,
+                    sound : form.value.sound,
+                    zoom : form.value.zoom,
+                    date : form.value.date,
+                    end_time : form.value.end_time,
+                    start_time : form.value.start_time,
+                    purpose : form.value.purpose,
+                    peserta : form.value.peserta,
+                    room_id : form.value.room_id,
+                }
+                if (statusData == 'add') {
+                    const response = await Meeting_BookingService.postAddBooking(post)
+                    const load = response.data.success;
+                    if (load == true) {
+                         emit('submit','add')
+                    } else {
+                        emit('submit','warning')
+                    }
+                } else {
+                    const response = await Meeting_BookingService.putUpdateBooking(datas.id, post)
+                    const load = response.data.success;
+                    if (load == true) {
+                         emit('submit','edit')
+                    } else {
+                        emit('submit','warning')
+                    }
+                }
+            } catch (error) {
+                emit('submit','danger')
+            }
         } else {
             emit('submit','close')
         }
@@ -95,18 +210,6 @@
 </script>
 <template>
     <form class=" py-3">
-        <div class="grid align-items-center justify-content-center">
-            <div class="col-11 md:col-11">
-                <div class="flex align-items-center gap-3 mr-auto">
-                    <Avatar image="/layout/meetrip.png" size="large" />
-                    <strong class="text-3xl" v-html="titleData"></strong>
-                </div>
-                <Divider/>
-            </div>
-            <div class="col-1 md:col-1 text-right p-fluid">
-                <Button severity="danger" icon="pi pi-times" rounded outlined @click="postData('close')" />
-            </div>
-        </div>
         <div class="grid align-items-center">
             <div class="col-12 md:col-12 p-fluid">
                 <p class="text-lg font-semibold">SCHEDULE</p>
@@ -116,7 +219,7 @@
                             <span class="p-inputgroup-addon">
                                 <i class="pi pi-calendar text-pink-400 font-bold"></i>
                             </span>
-                            <InputText type="date" v-model="form.tanggal" placeholder=""/>
+                            <InputText type="date" v-model="form.date" placeholder="" :min="date_now" />
                         </div>
                     </div>
                     <div class="col-4">
@@ -124,7 +227,7 @@
                             <span class="p-inputgroup-addon">
                                 <i class="pi pi-clock text-pink-400 font-bold"></i>
                             </span>
-                            <InputText type="time" v-model="form.start" placeholder="" @input="snackDisable()"/>
+                            <InputText type="time" v-model="form.start_time" placeholder="" @input="snackDisable()"/>
                         </div>
                     </div>
                     <div class="col-4">
@@ -132,7 +235,7 @@
                             <span class="p-inputgroup-addon">
                                 <i class="pi pi-clock text-pink-400 font-bold"></i>
                             </span>
-                            <InputText type="time" v-model="form.end" placeholder="" @input="snackDisable()"/>
+                            <InputText type="time" v-model="form.end_time" placeholder="" @input="snackDisable()"/>
                         </div>
                     </div>
                 </div>
@@ -143,13 +246,13 @@
                     <span class="p-inputgroup-addon">
                         <i class="pi pi-clock text-pink-400 font-bold"></i>
                     </span>
-                    <InputText v-model="form.topik" rows="4" cols="30" placeholder="Topic"/>
+                    <InputText v-model="form.purpose" rows="4" cols="30" placeholder="Topic"/>
                 </div>
                 <div class="p-inputgroup mt-2">
                     <span class="p-inputgroup-addon">
                         <i class="pi pi-clock text-pink-400 font-bold"></i>
                     </span>
-                    <Textarea v-model="form.partisipan" rows="4" cols="30" placeholder="Participant (Exp: Dari PT Maju Jaya Sempurna 11 Orang)"/>
+                    <Textarea v-model="form.peserta" rows="4" cols="30" placeholder="Participant (Exp: Dari PT Maju Jaya Sempurna 11 Orang)"/>
                 </div>
             </div>
             <div class="col-12 md:col-12">
@@ -157,23 +260,15 @@
                 <div class="grid">
                     <div class="col-6 md:col-3">
                         <strong><i class="pi pi-building mr-2 font-bold text-pink-400 text-xl"></i> Room</strong>
-                        <div class="flex align-items-center mt-3">
-                            <RadioButton v-model="form.room" inputId="room4" name="room" value="4" />
-                            <label for="room4" class="ml-2 flex align-items-center">Main Office Lantai 2</label>
-                        </div>
-                        <div class="flex align-items-center my-2">
-                            <RadioButton v-model="form.room" inputId="room5" name="room" value="5" />
-                            <label for="room5" class="ml-2 flex align-items-center">Front Office Lantai 1 A</label>
-                        </div>
-                        <div class="flex align-items-center">
-                            <RadioButton v-model="form.room" inputId="room3" name="room" value="3" />
-                            <label for="room3" class="ml-2 flex align-items-center">Front Office Lantai 1 B</label>
+                        <div class="flex align-items-center my-2" v-for="(list, index) in room_list" :key="index">
+                            <RadioButton v-model="form.room_id" :inputId="`room${list.id}`" name="room" :value="list.id" @input="rooms" />
+                            <label :for="`room${list.id}`" class="ml-2 flex align-items-center">{{list.name}}</label>
                         </div>
                     </div>
                     <div class="col-6 md:col-4">
                         <p><i class="pi pi-image mr-2 font-bold text-pink-400 text-xl"></i> Capture</p>
-                        <div v-show="form.room != null">
-                            <Image src="https://primefaces.org/cdn/primevue/images/galleria/galleria10.jpg" alt="Image" width="300" class="border-round-xl" />
+                        <div v-show="form.room_id != null">
+                            <Image :src="images" alt="Image" width="300" class="border-round-xl" />
                         </div>
                     </div>
                     <div class="col-12 md:col-5 p-fluid">
@@ -245,11 +340,11 @@
             </div>
             <div class="col-12 md:col-6">
                 <div class="flex gap-2">
-                    <Button label="close" severity="secondary" icon="pi pi-times" outlined @click="postData('close')" />
+                    <Button label="Close" severity="secondary" icon="pi pi-times" outlined @click="postData('close')" />
                 </div>
             </div>
             <div class="col-12 md:col-6">
-                <div class="flex justify-content-end gap-2">
+                <div class="flex justify-content-start md:justify-content-end gap-2">
                     <Button type="button" label="Save" severity="success" icon="pi pi-save" @click="postData('save')"/>
                     <Button label="Reset" severity="danger" icon="pi pi-refresh" @click="reset_form()"/>
                 </div>

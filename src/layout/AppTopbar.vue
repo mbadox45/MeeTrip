@@ -45,15 +45,15 @@ const onTopBarMenuButton = () => {
 const onSettingsClick = () => {
     // const roles = localStorage.getItem('roles');
     try {
-        const resp = UserService.logoutUser();
-        const load = resp.data;
-        if (load.code == 200) {
+        // const resp = UserService.logoutUser();
+        // const load = resp.data;
+        // if (load.code == 200) {
             localStorage.removeItem('usertoken');
             localStorage.removeItem('payload');
             localStorage.removeItem('roles');
             router.push('/auth/login');
             window.close();
-        }
+        // }
     } catch (error) {
         localStorage.removeItem('usertoken');
         localStorage.removeItem('payload');

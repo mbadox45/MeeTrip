@@ -13,10 +13,20 @@ export const menu_superadmin = [
     {
         label: 'Main Menu',
         items: [
-            { label: 'Pemberi Tugas', icon: 'pi pi-fw pi-tag', to: '/assignor-list' },
-            { label: 'SDM', icon: 'pi pi-fw pi-tag', to: '/sdm-list' },
-            { label: 'Atasan', icon: 'pi pi-fw pi-tag', to: '/atasan-list' },
-            { label: 'Log', icon: 'pi pi-fw pi-history', to: '/log-list' },
+            { label: 'BTO', icon: 'pi pi-fw pi-car',
+                items: [
+                    { label: 'Approve (DP)', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
+                    { label: 'Approve (Assignor / Superior)', icon: 'pi pi-fw pi-bookmark', to: '/approval' },
+                    { label: 'Approve (HC)', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
+                ]
+            },
+            { label: 'BTE', icon: 'pi pi-fw pi-car',
+                items: [
+                    { label: 'BTO - Approve (DP)', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
+                    { label: 'BTO - Approve (Assignor)', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
+                    { label: 'BTO - Approve (Superior)', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
+                ]
+            },
         ]
     },
 ]
@@ -28,10 +38,21 @@ export const menu_adminsdm = [
     {
         label: 'Main Menu',
         items: [
-            { label: 'Pemberi Tugas', icon: 'pi pi-fw pi-tag', to: '/assignor-list' },
-            { label: 'SDM', icon: 'pi pi-fw pi-tag', to: '/sdm-list' },
-            { label: 'Atasan', icon: 'pi pi-fw pi-tag', to: '/atasan-list' },
-            { label: 'Log', icon: 'pi pi-fw pi-history', to: '/log-list' },
+            { label: 'SPDK', icon: 'pi pi-fw pi-car',
+                items: [
+                    { label: 'My SPDK', icon: 'pi pi-fw pi-briefcase', to: '/my-spdk' },
+                    { label: 'BTO - Approve', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
+                ]
+            },
+            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', to: '/booked' 
+                // items: [
+                //     {
+                //         label: 'Booking',
+                //         icon: 'pi pi-fw pi-calendar',
+                //         to: '/booked'
+                //     },
+                // ]
+            },
         ]
     },
 ]
@@ -45,24 +66,41 @@ export const menu_adminga = [
         items: [
             { label: 'SPDK', icon: 'pi pi-fw pi-car',
                 items: [
-                    {
-                        label: 'BTO - Approve',
-                        icon: 'pi pi-fw pi-bookmark',
-                        to: '/bto-spdk'
+                    { label: 'My SPDK', icon: 'pi pi-fw pi-briefcase', to: '/my-spdk' },
+                    { label: 'Approval', icon: 'pi pi-fw pi-check-circle',
+                        items: [
+                            { label: 'BTO', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
+                            { label: 'BTE', icon: 'pi pi-fw pi-bookmark', to: '/bte-spdk' },
+                        ]
                     },
+                    { label: 'Travel Document', icon: 'pi pi-fw pi-inbox', to: '/surat-jalan' },
                 ]
             },
-            { label: 'Form Request', icon: 'pi pi-fw pi-book',
+            // { label: 'Form Request', icon: 'pi pi-fw pi-book',
+            //     items: [
+            //         {
+            //             label: 'Request - Approve',
+            //             icon: 'pi pi-fw pi-bookmark',
+            //             to: '/approve-request'
+            //         },
+            //         {
+            //             label: 'Request - To Do',
+            //             icon: 'pi pi-fw pi-bookmark',
+            //             to: '/todo-request'
+            //         },
+            //     ]
+            // },
+            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', 
                 items: [
                     {
-                        label: 'Request - Approve',
-                        icon: 'pi pi-fw pi-bookmark',
-                        to: '/approve-request'
+                        label: 'Master Room',
+                        icon: 'pi pi-fw pi-building',
+                        to: '/room'
                     },
                     {
-                        label: 'Request - To Do',
-                        icon: 'pi pi-fw pi-bookmark',
-                        to: '/todo-request'
+                        label: 'Booking',
+                        icon: 'pi pi-fw pi-calendar',
+                        to: '/booked'
                     },
                 ]
             },
@@ -148,19 +186,19 @@ export const menu_user = [
         label: 'Main Menu',
         items: [
             { label: 'My SPDK', icon: 'pi pi-fw pi-car', to: '/my-spdk' },
-            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', 
-                items: [
-                    {
-                        label: 'Booked',
-                        icon: 'pi pi-fw pi-calendar',
-                        to: '/booked'
-                    },
-                    {
-                        label: 'My Booking',
-                        icon: 'pi pi-fw pi-book',
-                        to: '/my-booking'
-                    },
-                ]
+            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', to:'/booked'
+                // items: [
+                //     {
+                //         label: 'Booked',
+                //         icon: 'pi pi-fw pi-calendar',
+                //         to: '/booked'
+                //     },
+                //     {
+                //         label: 'My Booking',
+                //         icon: 'pi pi-fw pi-book',
+                //         to: '/my-booking'
+                //     },
+                // ]
             },
         ]
     },
@@ -181,25 +219,30 @@ export const menu_user_approve = [
                         to: '/my-spdk'
                     },
                     {
-                        label: 'Approval',
+                        label: 'Approval (Assignor)',
                         icon: 'pi pi-fw pi-bookmark',
-                        to: '/approval'
+                        to: '/approval-assignor'
+                    },
+                    {
+                        label: 'Approval (Superior)',
+                        icon: 'pi pi-fw pi-bookmark-fill',
+                        to: '/approval-superior'
                     },
                 ]
             },
-            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', 
-                items: [
-                    {
-                        label: 'Booked',
-                        icon: 'pi pi-fw pi-calendar',
-                        to: '/booked'
-                    },
-                    {
-                        label: 'My Booking',
-                        icon: 'pi pi-fw pi-book',
-                        to: '/my-booking'
-                    },
-                ]
+            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', to:'/booked'
+                // items: [
+                //     {
+                //         label: 'Booked',
+                //         icon: 'pi pi-fw pi-calendar',
+                //         to: '/booked'
+                //     },
+                //     {
+                //         label: 'My Booking',
+                //         icon: 'pi pi-fw pi-book',
+                //         to: '/my-booking'
+                //     },
+                // ]
             },
         ]
     },

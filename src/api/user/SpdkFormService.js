@@ -12,7 +12,7 @@ export default new class User_SpdkFormService{
         return http_multipart.post(`my-spdk/add`,data);
     }
     putUpdateMySPDK(id,data){
-        return http.put(`my-spdk/update/${id}`,data);
+        return http_multipart.put(`my-spdk/update/${id}`,data);
     }
     putCancelMySPDK(id,data){
         return http.put(`my-spdk/cancel/${id}`,data);

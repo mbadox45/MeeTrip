@@ -54,8 +54,11 @@ const load = () => {
         <li class="text-center text-lg text-yellow-100">
             <strong>{{ payload.name }}</strong>
         </li>
-        <li class="text-center text-sm font-semibold text-yellow-200 mb-5">
+        <li class="text-center text-sm font-semibold text-yellow-200">
             <span>{{ payload.email }}</span>
+        </li>
+        <li class="text-center text-sm py-2 bg-white border-round font-semibold text-teal-600 mt-3 mb-5">
+            <span class="" style="text-transform: uppercase;">{{ roles == 'adminga' ? 'admin - ga' : roles == 'adminsdm' ? 'admin - sdm' : 'user' }}</span>
         </li>
         <Divider class="my-5" />
         <template v-for="(item, i) in model" :key="item">

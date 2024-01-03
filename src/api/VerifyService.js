@@ -12,6 +12,11 @@ class VerifyService{
     getAkses(headers){
         return http.get(`akses/app/get/${APP_ID}`, headers);
     }
+
+    // GET KURS MATA UANG
+    getKurs(){
+        return http.get('load/kurs');
+    }
 }
 
 export default new VerifyService;
