@@ -87,9 +87,9 @@
             const filteredData = response.data.data
             let data;
             if (payload.value.type == 'adminga') {
-                data = filteredData.filter(item => item.status === 9 || item.status === 11);
+                data = filteredData.filter(item => Number(item.status) == 9 || Number(item.status) == 11);
             } else {
-                data = filteredData.filter(item => item.status === 11);
+                data = filteredData.filter(item => Number(item.status) == 11);
             }
             const list = [];
             for (let i = 0; i < data.length; i++) {

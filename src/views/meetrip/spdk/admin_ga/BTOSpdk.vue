@@ -94,12 +94,12 @@
             let data;
             if (payload.value.type == 'adminga') {
                 if (route.path == '/bto-spdk') {
-                    data = filteredData.filter(item => item.status === 302);
+                    data = filteredData.filter(item => Number(item.status) == 302);
                 } else {
-                    data = filteredData.filter(item => item.status === 3 || item.status === 4);
+                    data = filteredData.filter(item => Number(item.status) == 3 || Number(item.status) == 4);
                 }
             } else {
-                data = filteredData.filter(item => item.status === 2);
+                data = filteredData.filter(item => Number(item.status) == 2);
             }
             const list = [];
             for (let i = 0; i < data.length; i++) {
