@@ -233,10 +233,10 @@
             <div class="flex align-items-center justify-content-end md:justify-content-between">
                 <div class="">
                     <i class="mr-4 text-2xl md:text-5xl pi pi-car"></i>
-                    <strong class="text-2xl md:text-5xl font-normal">BTO - {{ routes == '/bto-spdk' ? 'Approve' : 'Surat Jalan' }}</strong>
+                    <strong class="text-2xl md:text-5xl font-normal">All SPDK</strong>
                 </div>
                 <div class="hidden md:block">
-                    <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> BTO - {{ routes == '/bto-spdk' ? 'Approve' : 'Surat Jalan' }} <i class="pi pi-angle-double-right mx-2" v-show="payload.type != 'adminga'"></i> {{payload.type == 'adminga' ? null: 'Human Capital'}}</strong>
+                    <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> All SPDK</strong>
                 </div>
             </div>
         </div>
@@ -244,11 +244,7 @@
             <div class="card border-round-md">
                 <div class="flex justify-content-between align-items-center">
                     <div class="w-full">
-                        <h6 class="text-2xl">Need to {{ routes == '/bto-spdk' ? 'Approve' : 'Create Surat Jalan' }} - Business Trip Order (BTO)</h6>
-                    </div>
-                    <div class="w-full flex justify-content-end gap-2">
-                        <Button type="button" icon="pi pi-ellipsis-v" text @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" />
-                        <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+                        <h6 class="text-2xl">List SPDK</h6>
                     </div>
                 </div>
                 <Divider/>
