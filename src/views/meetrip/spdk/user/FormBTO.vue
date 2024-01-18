@@ -13,7 +13,7 @@
     import User_SpdkFormService from '@/api/user/SpdkFormService'
     import { getDescLoc, getLocationName } from '@/api/gmaps/MapsService'
     import { kendaraan, down_payment } from '@/api/Databodong';
-    import { GOOGLE_MAPS_API_KEYS } from '@/api/env';
+    import { GOOGLE_MAPS_API_KEYS, URL_MAPS_API, URL_API } from '@/api/env';
     
     const route = useRoute();
 
@@ -21,6 +21,7 @@
     const formID = route.query.id
     const list_atasan = ref([]);
     const lampiran = ref();
+    const roles = ref(localStorage.getItem('roles'));
     const payload = ref(JSON.parse(localStorage.getItem('payload')));
     const form = ref({id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]})
     const kendaraan_list = ref(kendaraan);
@@ -62,7 +63,7 @@
             kendaraan: load.kendaraan,
             rombongan: load.rombongan,
             uang_panjar: load.uang_panjar,
-            lampiran: `http://localhost:3333${load.lampiran}`,
+            lampiran: `${URL_API}${load.lampiran}`,
         }
         
         // Get Location
@@ -169,7 +170,7 @@
 
     // Get Longitude Latitude By Place_id
     const getLongLat = async(place) => {
-        const response = await axios.get('http://localhost:3031/v1/api/maps/by_place_id', {
+        const response = await axios.get(`${URL_MAPS_API}v1/api/maps/by_place_id`, {
             params: {
                 place_id: place,
                 fields: 'geometry',
@@ -184,7 +185,7 @@
     const onSearchInput = async (index) => {
     // const onSearchInput = async () => {
         try {
-            const response = await axios.get('http://localhost:3031/v1/api/maps/place_predictions', {
+            const response = await axios.get(`${URL_MAPS_API}v1/api/maps/place_predictions`, {
                 params: {
                 input: location.value[index].locate,
                 // input: start_location.value,
@@ -403,7 +404,8 @@
                                 <span class="p-inputgroup-addon">
                                     <i class="pi pi-calendar"></i>
                                 </span>
-                                <InputText type="date" v-model="form.tgl_berangkat" placeholder=""/>
+                                <InputText type="date" v-if="formID != null && roles == 'adminga'" v-model="form.tgl_berangkat" placeholder=""/>
+                                <InputText type="date" v-else v-model="form.tgl_berangkat" :min="moment(new Date).format('YYYY-MM-DD')" placeholder=""/>
                             </div>
                         </div>
                         <div class="col-12 md:6">
@@ -424,7 +426,8 @@
                                 <span class="p-inputgroup-addon">
                                     <i class="pi pi-calendar"></i>
                                 </span>
-                                <InputText type="date" v-model="form.tgl_kembali" placeholder=""/>
+                                <InputText type="date" v-if="formID != null && roles == 'adminga'" v-model="form.tgl_kembali" placeholder=""/>
+                                <InputText type="date" v-else v-model="form.tgl_kembali" :min="moment(new Date).format('YYYY-MM-DD')" placeholder=""/>
                             </div>
                         </div>
                         <div class="col-12 md:6">

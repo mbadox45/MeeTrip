@@ -44,15 +44,7 @@ export const menu_adminsdm = [
                     { label: 'BTO - Approve', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
                 ]
             },
-            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', to: '/booked' 
-                // items: [
-                //     {
-                //         label: 'Booking',
-                //         icon: 'pi pi-fw pi-calendar',
-                //         to: '/booked'
-                //     },
-                // ]
-            },
+            { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', to: '/booked' },
         ]
     },
 ]
@@ -74,22 +66,9 @@ export const menu_adminga = [
                         ]
                     },
                     { label: 'Travel Document', icon: 'pi pi-fw pi-inbox', to: '/surat-jalan' },
+                    { label: 'All SPDK', icon: 'pi pi-fw pi-inbox', to: '/all-spdk' },
                 ]
             },
-            // { label: 'Form Request', icon: 'pi pi-fw pi-book',
-            //     items: [
-            //         {
-            //             label: 'Request - Approve',
-            //             icon: 'pi pi-fw pi-bookmark',
-            //             to: '/approve-request'
-            //         },
-            //         {
-            //             label: 'Request - To Do',
-            //             icon: 'pi pi-fw pi-bookmark',
-            //             to: '/todo-request'
-            //         },
-            //     ]
-            // },
             { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', 
                 items: [
                     {

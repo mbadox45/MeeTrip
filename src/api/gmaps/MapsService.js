@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GOOGLE_MAPS_API_KEYS } from '../env';
+import { GOOGLE_MAPS_API_KEYS, URL_MAPS_API } from '../env';
 
 export const getLocationName = async (latitude, longitude) => {
     try {
@@ -18,7 +18,7 @@ export const getLocationName = async (latitude, longitude) => {
 };
 
 export const getLongLat = async(place) => {
-    const response = await axios.get('http://localhost:3031/v1/api/maps/by_place_id', {
+    const response = await axios.get(`${URL_MAPS_API}v1/api/maps/by_place_id`, {
         params: {
             place_id: place,
             fields: 'geometry',
@@ -30,7 +30,7 @@ export const getLongLat = async(place) => {
 }
 
 export const getDescLoc = async(place) => {
-    const response = await axios.get('http://localhost:3031/v1/api/maps/bylnglat', {
+    const response = await axios.get(`${URL_MAPS_API}v1/api/maps/bylnglat`, {
         params: {
             place_id: place,
             key: GOOGLE_MAPS_API_KEYS,

@@ -77,6 +77,7 @@
         // Filter By Wilayah + Jabatan
         const region =  wilayah.value[Number(spdk.wilayah)-1]
         const filteredData = data.filter(item => item.wilayah === region && item.jabatan === spdk.golongan);
+        // console.log(filteredData)
         console.log(filteredData[0])
         dis_form.value = {
             sarapan: calculateConsumtionMax(spdk, filteredData[0].pagi, 'pagi'),

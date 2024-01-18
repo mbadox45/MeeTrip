@@ -1,30 +1,36 @@
 <script setup>
     import { onMounted, ref } from 'vue';
-    import { useRouter } from 'vue-router';
+    import { useRouter, useRoute } from 'vue-router';
     import moment from 'moment';
     import { useToast } from 'primevue/usetoast';
+    import axios from 'axios';
 
     // API
-    import User_SpdkApproveService from '@/api/user/SpdkApproveService.js';
-    import {getLocationName} from '@/api/gmaps/MapsService.js';
-    import { URL_WEB } from '@/api/env';
+    import Admin_SpdkAdminService from '@/api/admin/SpdkAdminService.js';
+    import { URL_WEB, GOOGLE_MAPS_API_KEYS } from '@/api/env';
 
     
     // Component
-    import {menu_1_or_5} from '@/api/components/ListMenu.js';
+    import {menu_302_admin, menu_2, menu_3, menu_4, menu_0_or_12} from '@/api/components/ListMenu.js';
+    // Component Admin GA
     import ApproveSpdk from '@/views/meetrip/spdk/admin_ga/components/ApproveSpdk.vue';
-    import DetailSpdk from '@/views/meetrip/spdk/user/components/DetailSpdk.vue';
+    import RevisiSpdk from '@/views/meetrip/spdk/admin_ga/components/RevisiSpdk.vue';
+    import PrintSpdk from '@/views/meetrip/spdk/admin_ga/components/PrintSpdk.vue';
+    import CreateSurat from '@/views/meetrip/spdk/admin_ga/components/CreateSurat.vue';
+    // Component User
     import CancelSpdk from '@/views/meetrip/spdk/user/components/CancelSpdk.vue';
     import TimelineSpdk from '@/views/meetrip/spdk/user/components/TimelineSpdk.vue';
-    import PrintSpdk from '@/views/meetrip/spdk/admin_ga/components/PrintSpdk.vue';
+    import DetailSpdk from '@/views/meetrip/spdk/user/components/DetailSpdk.vue';
 
     const router = useRouter();
+    const route = useRoute();
 
     const dialogs = ref(false)
 
     const payload = ref(JSON.parse(localStorage.getItem('payload')));
     const loadingTable = ref(null);
-    const loadingTable2 = ref(true);
+    const routes = ref(route.path)
+    const loadingTable2 = ref(false);
     const request_data = ref([])
     const menuModel = ref([]);
     const cm = ref();
@@ -32,6 +38,7 @@
     const titledialogs = ref();
     const statusRequest = ref('');
     const menu = ref();
+    const GOOGLE_MAPS_API_KEY = GOOGLE_MAPS_API_KEYS;
     const items = ref([
         {
             label: 'Options',
@@ -62,30 +69,41 @@
     const toggle = (event) => {
         menu.value.toggle(event);
     };
+
+    const getLocationName = async (latitude, longitude) => {
+        try {
+            const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+                params: {
+                    latlng: `${latitude},${longitude}`,
+                    key: GOOGLE_MAPS_API_KEY,
+                },
+            });
+
+            const locationName = response.data.results[0].formatted_address;
+            return locationName
+        } catch (error) {
+            return 'Error fetching location name'
+        }
+    };
     
     const aksi = async () => {
-        // loadingTable.value = 'Loading'
+        loadingTable2.value = true
         try {
-            const response = await User_SpdkApproveService.getPemberiTugas();
-            const filteredData = response.data.data
-            const data = filteredData.filter(item => Number(item.status) == 1);
-            // console.log(data)
+            const response = await Admin_SpdkAdminService.getSPDK();
+            const data = response.data.data;
             const list = [];
             for (let i = 0; i < data.length; i++) {
                 let loc='';
                 if (data[i].destinations.length > 0) {
-                    // console.log(data[i].destinations)
                     if (data[i].destinations.length > 1) {
-                        // const destination = data[i].destinations
+                        const destination = data[i].destinations
                         loc += '<ol>'
                         for (let a = 0; a < destination.length; a++) {
-                            loc += `<li>${(await getLocationName(destination[a].latitude, destination[a].longitude)).formatted_address}</li>`
-                            // console.log(await getLocationName(destination[a].latitude, destination[a].longitude))
+                            loc += `<li>${await getLocationName(destination[a].latitude, destination[a].longitude)}</li>`
                         }
                         loc += '</ol>'
                     } else {
-                        loc = `<span>${(await getLocationName(data[i].destinations[0].latitude, data[i].destinations[0].longitude)).formatted_address}</span>`;
-                        // console.log((await getLocationName(data[i].destinations[0].latitude, data[i].destinations[0].longitude)).formatted_address)
+                        loc = `<span>${await getLocationName(data[i].destinations[0].latitude, data[i].destinations[0].longitude)}</span>`;
                     }
                 } else {
                     loc = `<span>${data[i].tujuan}</span>`;
@@ -99,11 +117,14 @@
                     status: data[i].status,
                     nomor_surat: data[i].nomor_surat,
                     meta:data[i].meta,
+                    kendaraan:data[i].kendaraan,
+                    nama_supir:data[i].nama_supir,
+                    no_kendaraan:data[i].no_kendaraan,
                     user:data[i].user,
                 };
             }
+            loadingTable2.value = false
             request_data.value = list;
-            loadingTable2.value = false;
         } catch (error) {
             loadingTable2.value = false;
             request_data.value = []
@@ -118,7 +139,7 @@
         loadMenu();
     };
     const loadMenu = () => {
-        menuModel.value = menu_1_or_5([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'approve'), () => detailData(selectedRequest.value, 'decline'), () => detailData(selectedRequest.value, 'print')])
+        menuModel.value = menu_0_or_12([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
     }
 
     // Dialog Function
@@ -127,15 +148,29 @@
         if (status === 'detail') {
             dialogs.value = true;
             titledialogs.value = `<span class="font-semibold">VIEW DETAIL</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor_surat}`;
-        } else if (status === 'decline') {
+        } else if (status === 'timeline') {
             dialogs.value = true;
-            titledialogs.value = `<span class="font-semibold">DECLINE SPDK</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor_surat}`;
+            titledialogs.value = `<span class="font-semibold">TIMELINE SPDK</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor_surat}`;
         } else if (status === 'revisi') {
             titledialogs.value = `<span class="font-semibold">REVISION (DOWN PAYMENT)</span> <i class="pi pi-angle-double-right text-gray-500 mx-2 text-lg"></i> ${data.nomor_surat}`;
             dialogs.value = true;
-        } else if (status === 'approve') {
+        } else if (status === 'edit') {
+            router.push(`/form-bto?id=${data.id}`);
+        } else if (status === 'create') {
+            titledialogs.value = `<span class="font-semibold">CREATE SURAT</span> <i class="pi pi-angle-double-right text-gray-500 mx-2 text-lg"></i> ${data.nomor_surat}`;
             dialogs.value = true;
-            titledialogs.value = `<span class="font-semibold text-cyan-500">APPROVE (${data.status == 1 ? 'ASSIGNOR' : 'SUPERIOR'})</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor_surat}`;
+        } else if (status === 'edit_surat') {
+            titledialogs.value = `<span class="font-semibold">EDIT SURAT</span> <i class="pi pi-angle-double-right text-gray-500 mx-2 text-lg"></i> ${data.nomor_surat}`;
+            dialogs.value = true;
+        } else if (status === 'approve') {
+            titledialogs.value = `<span class="font-semibold">APPROVE (${payload.value.type == 'adminga' ? 'DOWN PAYMENT': 'by HUMAN CAPITAL'})</span> <i class="pi pi-angle-double-right text-cyan-500 mx-2 text-lg"></i> ${data.nomor_surat}`;
+            dialogs.value = true;
+        } else if (status === 'submit') {
+            titledialogs.value = `<span class="font-semibold">SUBMIT SURAT</span> <i class="pi pi-angle-double-right text-cyan-500 mx-2 text-lg"></i> ${data.nomor_surat}`;
+            dialogs.value = true;
+        } else if (status === 'decline') {
+            titledialogs.value = `<span class="font-semibold">DECLINE SPDK</span> <i class="pi pi-angle-double-right text-cyan-500 mx-2 text-lg"></i> ${data.nomor_surat}`;
+            dialogs.value = true;
         } else {
             dialogs.value = true;
             titledialogs.value = `<span class="font-semibold">PRINT SPDK</span> <i class="pi pi-angle-double-right mx-2 text-lg"></i> ${data.nomor_surat}`;
@@ -151,17 +186,22 @@
         if (ket == 'success_approve') {
             dialogs.value = false
             toast.add({ severity: 'success', summary: 'Successfully', detail: `Approved successfully`, life: 3000 });
-            loadingTable2.value = false;
             aksi();
         } else if (ket == 'success_revisi') {
             dialogs.value = false
             toast.add({ severity: 'success', summary: 'Successfully', detail: `Revision to user successfully`, life: 3000 });
-            loadingTable2.value = false;
+            aksi();
+        } else if (ket == 'create_surat') {
+            dialogs.value = false
+            toast.add({ severity: 'success', summary: 'Successfully', detail: `Create surat successfully`, life: 3000 });
+            aksi();
+        } else if (ket == 'success_submit') {
+            dialogs.value = false
+            toast.add({ severity: 'success', summary: 'Successfully', detail: `Submit surat successfully`, life: 3000 });
             aksi();
         } else if (ket == 'success_cancel') {
             dialogs.value = false
             toast.add({ severity: 'success', summary: 'Successfully', detail: `Decline successfully`, life: 3000 });
-            loadingTable2.value = false;
             aksi();
         } else if (ket == 'danger') {
             dialogs.value = false
@@ -181,19 +221,22 @@
             <template #header>
                 <h4 v-html="titledialogs"></h4>
             </template>
-            <approve-spdk :data_dialog="selectedRequest" :status_dialog="selectedRequest.status == 1 ? 'approve_pemberi_tugas' : 'approve_atasan'" v-if="statusRequest == 'approve'" @submit="postData"/>
+            <approve-spdk :data_dialog="selectedRequest" :status_dialog="statusRequest == 'approve' ? payload.type == 'adminga'? 'approve_dp' : 'approve_hc' : 'submit_surat'" v-if="statusRequest == 'approve' || statusRequest == 'submit'" @submit="postData"/>
             <detail-spdk :data_dialog="selectedRequest" v-else-if="statusRequest == 'detail'"/>
             <print-spdk :data_dialog="selectedRequest" v-else-if="statusRequest == 'print'"/>
-            <cancel-spdk :data_dialog="selectedRequest" :status_dialog="'decline_assignor'" v-else @submit="postData"/>
+            <timeline-spdk :data_dialog="selectedRequest" v-else-if="statusRequest == 'timeline'"/>
+            <cancel-spdk :data_dialog="selectedRequest" :status_dialog="'decline_hc'" v-else-if="statusRequest == 'decline'" @submit="postData"/>
+            <create-surat :data_dialog="selectedRequest" v-else-if="statusRequest == 'create' || statusRequest == 'edit_surat'" @submit="postData"/>
+            <revisi-spdk :data_dialog="selectedRequest" v-else @submit="postData"/>
         </Dialog>
         <div class="col-12 md:col-12">
             <div class="flex align-items-center justify-content-end md:justify-content-between">
                 <div class="">
                     <i class="mr-4 text-2xl md:text-5xl pi pi-car"></i>
-                    <strong class="text-2xl md:text-5xl font-normal">BTO - Approve (Assignor)</strong>
+                    <strong class="text-2xl md:text-5xl font-normal">BTO - {{ routes == '/bto-spdk' ? 'Approve' : 'Surat Jalan' }}</strong>
                 </div>
                 <div class="hidden md:block">
-                    <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> BTO - Approve <i class="pi pi-angle-double-right mx-2"></i> Assignor</strong>
+                    <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> BTO - {{ routes == '/bto-spdk' ? 'Approve' : 'Surat Jalan' }} <i class="pi pi-angle-double-right mx-2" v-show="payload.type != 'adminga'"></i> {{payload.type == 'adminga' ? null: 'Human Capital'}}</strong>
                 </div>
             </div>
         </div>
@@ -201,7 +244,11 @@
             <div class="card border-round-md">
                 <div class="flex justify-content-between align-items-center">
                     <div class="w-full">
-                        <h6 class="text-2xl">Need to Approve - Business Trip Order (BTO)</h6>
+                        <h6 class="text-2xl">Need to {{ routes == '/bto-spdk' ? 'Approve' : 'Create Surat Jalan' }} - Business Trip Order (BTO)</h6>
+                    </div>
+                    <div class="w-full flex justify-content-end gap-2">
+                        <Button type="button" icon="pi pi-ellipsis-v" text @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" />
+                        <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
                     </div>
                 </div>
                 <Divider/>
@@ -211,9 +258,9 @@
                 </div>
                 <div v-show=" loadingTable2 == false">
                     <ContextMenu ref="cm" :model="menuModel"></ContextMenu>
-                    <DataTable :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" scrollable tableStyle="min-width: 50rem">
+                    <DataTable :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" tableStyle="min-width: 50rem">
                         <template #empty><p class="text-center"> Data not found. </p></template>
-                        <Column field="nomor_surat" frozen header="Reference Number" style="min-width: 12rem">
+                        <Column field="nomor_surat" header="Reference Number" style="min-width: 12rem">
                             <template #body="{ data }">
                                 <strong>{{ data.nomor_surat }}</strong>
                             </template>
@@ -223,25 +270,14 @@
                                 <strong>{{ data.user.name }}</strong>
                             </template>
                         </Column>
-                        <Column field="golongan" header="Position" style="min-width: 12rem">
-                            <template #body="{ data }">
-                                {{ data.golongan }}
-                            </template>
-                        </Column>
-                        <Column field="submit_date" header="Submit Date" style="min-width: 12rem">
-                            <template #body="{ data }">
-                                {{ data.submit_date }}
-                            </template>
-                        </Column>
-                        <Column field="status" header="Status" style="min-width: 12rem">
-                            <template #body="{ data }">
-                                <Badge v-if="data.status == 1" value="Approve Pemberi Tugas" severity="info"></Badge>
-                                <Badge v-else value="Approve Atasan"></Badge>
-                            </template>
-                        </Column>
                         <Column field="destination" header="Destination" class="min-w-10">
                             <template #body="{ data }">
                                 <div v-html="data.destination"></div>
+                            </template>
+                        </Column>
+                        <Column field="info" header="Information" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <div class="bg-cyan-500 p-2 text-white font-semibold border-round text-sm">{{ data.info }}</div>
                             </template>
                         </Column>
                     </DataTable>

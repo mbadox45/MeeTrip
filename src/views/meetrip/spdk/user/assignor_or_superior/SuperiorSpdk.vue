@@ -67,7 +67,7 @@
         try {
             const response = await User_SpdkApproveService.getAtasan();
             const filteredData = response.data.data
-            const data = filteredData.filter(item => item.status === 5);
+            const data = filteredData.filter(item => Number(item.status) == 5);
             const list = [];
             for (let i = 0; i < data.length; i++) {
                 let loc='';
@@ -76,11 +76,11 @@
                         const destination = data[i].destinations
                         loc += '<ol>'
                         for (let a = 0; a < destination.length; a++) {
-                            loc += `<li>${await getLocationName(destination[a].latitude, destination[a].longitude).formatted_address}</li>`
+                            loc += `<li>${(await getLocationName(destination[a].latitude, destination[a].longitude)).formatted_address}</li>`
                         }
                         loc += '</ol>'
                     } else {
-                        loc = `<span>${await getLocationName(data[i].destinations[0].latitude, data[i].destinations[0].longitude).formatted_address}</span>`;
+                        loc = `<span>${(await getLocationName(data[i].destinations[0].latitude, data[i].destinations[0].longitude)).formatted_address}</span>`;
                     }
                 } else {
                     loc = `<span>${data[i].tujuan}</span>`;
@@ -98,6 +98,7 @@
                 };
             }
             request_data.value = list;
+            loadingTable2.value = false;
         } catch (error) {
             loadingTable2.value = false;
             request_data.value = []
@@ -142,10 +143,12 @@
         if (ket == 'success_approve') {
             dialogs.value = false
             toast.add({ severity: 'success', summary: 'Successfully', detail: `Approved successfully`, life: 3000 });
+            loadingTable2.value = false;
             aksi();
         } else if (ket == 'success_revisi') {
             dialogs.value = false
             toast.add({ severity: 'success', summary: 'Successfully', detail: `Revision to user successfully`, life: 3000 });
+            loadingTable2.value = false;
             aksi();
         } else if (ket == 'danger') {
             dialogs.value = false
@@ -189,41 +192,47 @@
                     </div>
                 </div>
                 <Divider/>
-                <ContextMenu ref="cm" :model="menuModel"></ContextMenu>
-                <DataTable :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" scrollable tableStyle="min-width: 50rem">
-                    <template #empty><p class="text-center"> Data not found. </p></template>
-                    <Column field="nomor_surat" frozen header="Reference Number" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <strong>{{ data.nomor_surat }}</strong>
-                        </template>
-                    </Column>
-                    <Column field="user" header="Requestor" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <strong>{{ data.user.name }}</strong>
-                        </template>
-                    </Column>
-                    <Column field="golongan" header="Position" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            {{ data.golongan }}
-                        </template>
-                    </Column>
-                    <Column field="submit_date" header="Submit Date" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            {{ data.submit_date }}
-                        </template>
-                    </Column>
-                    <Column field="status" header="Status" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <Badge v-if="data.status == 1" value="Approve Pemberi Tugas" severity="info"></Badge>
-                            <Badge v-else value="Approve Atasan"></Badge>
-                        </template>
-                    </Column>
-                    <Column field="destination" header="Destination" class="min-w-10">
-                        <template #body="{ data }">
-                            <div v-html="data.destination"></div>
-                        </template>
-                    </Column>
-                </DataTable>
+                <div v-show="loadingTable2 == true" class="text-center">
+                    <h3>Loading...</h3>
+                    <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
+                </div>
+                <div v-show=" loadingTable2 == false">
+                    <ContextMenu ref="cm" :model="menuModel"></ContextMenu>
+                    <DataTable :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" scrollable tableStyle="min-width: 50rem">
+                        <template #empty><p class="text-center"> Data not found. </p></template>
+                        <Column field="nomor_surat" frozen header="Reference Number" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <strong>{{ data.nomor_surat }}</strong>
+                            </template>
+                        </Column>
+                        <Column field="user" header="Requestor" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <strong>{{ data.user.name }}</strong>
+                            </template>
+                        </Column>
+                        <Column field="golongan" header="Position" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                {{ data.golongan }}
+                            </template>
+                        </Column>
+                        <Column field="submit_date" header="Submit Date" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                {{ data.submit_date }}
+                            </template>
+                        </Column>
+                        <Column field="status" header="Status" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <Badge v-if="data.status == 1" value="Approve Pemberi Tugas" severity="info"></Badge>
+                                <Badge v-else value="Approve Atasan"></Badge>
+                            </template>
+                        </Column>
+                        <Column field="destination" header="Destination" class="min-w-10">
+                            <template #body="{ data }">
+                                <div v-html="data.destination"></div>
+                            </template>
+                        </Column>
+                    </DataTable>
+                </div>
             </div>
         </div>
     </div>

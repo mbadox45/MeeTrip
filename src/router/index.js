@@ -36,6 +36,16 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/all-spdk',
+                    name: 'all-spdk',
+                    component: () => import('@/views/meetrip/spdk/admin_ga/AllSpdk.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        adminga:true,
+                        superadmin:true,
+                    }
+                },
+                {
                     path: '/form-bto',
                     name: 'form-bto',
                     component: () => import('@/views/meetrip/spdk/user/FormBTO.vue'),
@@ -53,6 +63,7 @@ const router = createRouter({
                     meta:{
                         requiresAuth: true,
                         adminga:true,
+                        adminsdm:true,
                         user:true,
                     }
                 },
