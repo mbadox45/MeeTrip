@@ -104,8 +104,8 @@ const onSubmit = (e) => {
             </div>
             <Divider layout="vertical" class="hidden md:block"/>
             <div class="w-full shadow-5 py-6 px-5 md:px-6 sm:px-4 bg-white" style="border-radius: 40px">
-
-                <form @submit="onSubmit">
+                <Button label="Please login to Portal APPS" class="w-full p-3 text-cyan-500 text-xl bg-transparent border-none" @click="link('sso')" rounded></Button>
+                <!-- <form @submit="onSubmit">
                     <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
                     <InputText id="email1" type="email" placeholder="Email address" class="w-full mb-5" style="padding: 1rem" v-model="email" autocomplete="off" />
 
@@ -116,7 +116,6 @@ const onSubmit = (e) => {
                         <div class="flex align-items-center">
                             <a class="font-medium no-underline cursor-pointer hover:text-primary-600" @click="link('password')" ><i class="pi pi-book mr-2"></i> Manual Book</a>
                         </div>
-                        <!-- <a class="font-medium no-underline ml-2 text-right cursor-pointer" @click="link('password')"></a> -->
                     </div>
                     <label v-if="isLoading == true" class="block text-900 text-xl font-medium mb-2">Loading ...</label>
                     <Button label="Sign In" class="w-full p-3 text-xl bg-blue-800 border-none" type="submit" rounded></Button>
@@ -127,7 +126,7 @@ const onSubmit = (e) => {
                     <div class="text-center block md:hidden">
                         <h5>{{apps}} - INL</h5> <span class="mx-1">&copy;</span> 2023 - PT. Industri Nabati Lestari
                     </div>
-                </form>
+                </form> -->
             </div>
         </div>
     </div>
