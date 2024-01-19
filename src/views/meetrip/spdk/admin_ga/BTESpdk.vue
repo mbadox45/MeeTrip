@@ -12,11 +12,11 @@
     
     // Component
     import {menu_9, menu_11, menu_0_or_12} from '@/api/components/ListMenu.js';
-    import ApproveSpdk from './components/ApproveSpdk.vue';
-    import RevisiSpdk from './components/RevisiSpdk.vue';
-    import DetailSpdk from './components/DetailSpdk.vue';
-    import PrintSpdk from './components/PrintSpdk.vue';
-    import CreateSurat from './components/CreateSurat.vue';
+    import ApproveSpdk from '@/views/meetrip/spdk/admin_ga/components/ApproveSpdk.vue';
+    import RevisiSpdk from '@/views/meetrip/spdk/admin_ga/components/RevisiSpdk.vue';
+    import DetailSpdk from '@/views/meetrip/spdk/user/components/DetailSpdk.vue';
+    import PrintSpdk from '@/views/meetrip/spdk/admin_ga/components/PrintSpdk.vue';
+    import CreateSurat from '@/views/meetrip/spdk/admin_ga/components/CreateSurat.vue';
 
     const router = useRouter();
 
@@ -237,7 +237,7 @@
             <div class="card border-round-md">
                 <div class="flex justify-content-between align-items-center">
                     <div class="w-full">
-                        <h6 class="text-2xl">Need to Approve - Business Trip Order (BTO)</h6>
+                        <h6 class="text-2xl">Need to Approve - Business Trip Expenses (BTE)</h6>
                     </div>
                     <div class="w-full flex justify-content-end gap-2">
                         <Button type="button" icon="pi pi-ellipsis-v" text @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" />
