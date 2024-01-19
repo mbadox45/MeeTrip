@@ -121,7 +121,7 @@
         if (selectedRequest.value.status == 300) {
             menuModel.value = menu_300([() => detailData(selectedRequest.value, 'detail'), () => router.push(`/dp-bto/${selectedRequest.value.id}`), () => window.open(URL_WEB+'print/'+selectedRequest.value.id), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'cancel'), () => detailData(selectedRequest.value, 'print'),() => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 301) {
-            menuModel.value = menu_301([() => detailData(selectedRequest.value, 'submit_dp'), () => detailData(selectedRequest.value, 'edit_dp'), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'timeline')])
+            menuModel.value = menu_301([() => detailData(selectedRequest.value, 'submit_dp'), () => detailData(selectedRequest.value, 'edit_dp'), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 302) {
             menuModel.value = menu_302([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'cancel'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 303) {

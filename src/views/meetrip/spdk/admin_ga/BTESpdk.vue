@@ -126,6 +126,7 @@
                 };
             }
             request_data.value = list;
+            loadingTable2.value = false;
         } catch (error) {
             loadingTable2.value = false;
             request_data.value = []
@@ -212,7 +213,7 @@
 <template>
     <div class="grid align-items-center">
         <Toast/>
-        <Dialog v-model:visible="dialogs" modal header="Header" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="dialogs" modal header="Header" :style="{ width: statusRequest == 'detail'? '85rem':'50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <template #header>
                 <h4 v-html="titledialogs"></h4>
             </template>
@@ -245,30 +246,36 @@
                     </div>
                 </div>
                 <Divider/>
-                <ContextMenu ref="cm" :model="menuModel"></ContextMenu>
-                <DataTable :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" tableStyle="min-width: 50rem">
-                    <template #empty><p class="text-center"> Data not found. </p></template>
-                    <Column field="nomor_surat" header="Reference Number" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <strong>{{ data.nomor_surat }}</strong>
-                        </template>
-                    </Column>
-                    <Column field="user" header="Requestor" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <strong>{{ data.user.name }}</strong>
-                        </template>
-                    </Column>
-                    <Column field="destination" header="Destination" class="min-w-10">
-                        <template #body="{ data }">
-                            <div v-html="data.destination"></div>
-                        </template>
-                    </Column>
-                    <Column field="info" header="Information" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <div class="bg-cyan-500 p-2 text-white font-semibold border-round text-sm">{{ data.info }}</div>
-                        </template>
-                    </Column>
-                </DataTable>
+                <div v-show="loadingTable2 == true" class="text-center">
+                    <h3>Loading...</h3>
+                    <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
+                </div>
+                <div v-show=" loadingTable2 == false">
+                    <ContextMenu ref="cm" :model="menuModel"></ContextMenu>
+                    <DataTable :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" tableStyle="min-width: 50rem">
+                        <template #empty><p class="text-center"> Data not found. </p></template>
+                        <Column field="nomor_surat" header="Reference Number" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <strong>{{ data.nomor_surat }}</strong>
+                            </template>
+                        </Column>
+                        <Column field="user" header="Requestor" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <strong>{{ data.user.name }}</strong>
+                            </template>
+                        </Column>
+                        <Column field="destination" header="Destination" class="min-w-10">
+                            <template #body="{ data }">
+                                <div v-html="data.destination"></div>
+                            </template>
+                        </Column>
+                        <Column field="info" header="Information" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <div class="bg-cyan-500 p-2 text-white font-semibold border-round text-sm">{{ data.info }}</div>
+                            </template>
+                        </Column>
+                    </DataTable>
+                </div>
             </div>
         </div>
     </div>
