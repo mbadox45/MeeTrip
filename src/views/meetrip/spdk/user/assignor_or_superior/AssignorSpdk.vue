@@ -68,7 +68,7 @@
         try {
             const response = await User_SpdkApproveService.getPemberiTugas();
             const filteredData = response.data.data
-            const data = filteredData.filter(item => Number(item.status) == 1);
+            const data = filteredData.filter(item => item.status == '1');
             // console.log(data)
             const list = [];
             for (let i = 0; i < data.length; i++) {

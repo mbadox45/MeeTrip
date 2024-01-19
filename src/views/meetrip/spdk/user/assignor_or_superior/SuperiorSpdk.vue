@@ -67,7 +67,7 @@
         try {
             const response = await User_SpdkApproveService.getAtasan();
             const filteredData = response.data.data
-            const data = filteredData.filter(item => Number(item.status) == 5);
+            const data = filteredData.filter(item => item.status == '5');
             const list = [];
             for (let i = 0; i < data.length; i++) {
                 let loc='';
