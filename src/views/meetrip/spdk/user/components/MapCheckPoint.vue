@@ -140,22 +140,26 @@
     };
     
     const submit = async() => {
-        const distance = distances
-        
-        console.log(distance)
-        if (distance > 100) {
-            emit('submit','luar')
-            console.log('luar')
-        } else {
-            const response = await User_PelaksanaService.putAttendSPDK(load_data[1].id, {current_latitude: load_data[1].latitude, current_longitude: load_data[1].longitude});
-            const data = response.data;
-            // console.log(response)
-            if (data.status == true) {
-                emit('submit','success')
+        try {
+            const distance = distances
+            console.log(distance)
+            if (distance > 100) {
+                emit('submit','luar')
+                console.log('luar')
             } else {
-                emit('submit','error')
+                const response = await User_PelaksanaService.putAttendSPDK(load_data[1].id, {current_latitude: load_data[1].latitude, current_longitude: load_data[1].longitude});
+                const data = response.data;
+                // console.log(response)
+                if (data.status == true) {
+                    emit('submit','success')
+                } else {
+                    emit('submit','error')
+                }
             }
+        } catch (error) {
+            emit('submit','distance_out')
         }
+        
     }
 </script>
   

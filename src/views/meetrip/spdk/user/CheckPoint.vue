@@ -12,8 +12,8 @@
     import { getDescLoc, getLocationName } from '@/api/gmaps/MapsService'
 
     // Components
-    import MapCheckPoint from './components/MapCheckPoint.vue'
-    import { useGeolocation } from './components/useGeolocation';
+    import MapCheckPoint from '@/views/meetrip/spdk/user/components/MapCheckPoint.vue'
+    import { useGeolocation } from '@/views/meetrip/spdk/user/components/useGeolocation';
 
     const router = useRouter();
     const route = useRoute();
@@ -54,10 +54,11 @@
                         {id:data[i].id, place_id:get_placenow.place_id, latitude: get_placenow.geometry.location.lat, longitude: get_placenow.geometry.location.lng, address: get_placenow.formatted_address, name: placenow.name,}
                     ],
                     name: place.name,
+                    attend: data[i].attend,
                 }
             }
             destination.value = list
-            // console.log(destination.value)
+            console.log(destination.value)
         } else {
             destination.value = []
         }
@@ -68,13 +69,23 @@
     });
 
     const postData = async (id_dest, data_dest) => {
-        const response = await User_PelaksanaService.putAttendSPDK(id_dest, data_dest);
-        const data = response.data;
-        console.log(response)
-        if (data.success == true) {
-            toast.add({ severity: 'success', summary: 'Successfully', detail: `Check point successfully`, life: 3000 });
-        } else {
-            toast.add({ severity: 'warn', summary: 'Warning', detail: `You are out of reach of your destination location`, life: 3000 });
+        console.log(id_dest, data_dest)
+        data_dest = {
+            current_latitude : 3.586066, 
+            current_longitude : 98.661165
+        }
+        try {
+            const response = await User_PelaksanaService.putAttendSPDK(id_dest, data_dest);
+            const data = response.data;
+            console.log(response)
+            if (data.success == true) {
+                toast.add({ severity: 'success', summary: 'Successfully', detail: `Check point successfully`, life: 3000 });
+                load_data()
+            } else {
+                toast.add({ severity: 'warn', summary: 'Warning', detail: `You are out of reach of your destination location`, life: 3000 });
+            }
+        } catch (error) {
+            toast.add({ severity: 'danger', summary: 'Attention', detail: `Cannot attend when the distance is greater than 100 meters.`, life: 3000 });
         }
     }
 </script>
@@ -139,10 +150,10 @@
         </Divider>
         <Panel toggleable v-show="destination.length > 0" v-for="(lokasi, index) in destination" :key="index">
             <template #header>
-                <strong class="font-semibold text-gray-500"><i class="pi pi-map-marker mr-2 text-pink-500 font-bold"></i> {{ lokasi.name.toUpperCase() }}</strong>
+                <strong class="font-semibold text-gray-500"><i class="pi pi-map-marker mr-2 text-pink-500 font-bold"></i> {{ lokasi.name.toUpperCase() }} <small v-show="lokasi.attend == true" class="ml-3 text-green-500">Done</small></strong>
             </template>
-            <div class="grid align-items-center">
-                <div class="col-12 md:col-10">
+            <div class="flex align-items-center">
+                <div class="w-full">
                     <p>
                         <i class="pi pi-map-marker mr-2 text-xl text-red-500"></i> <strong class="mr-2 text-green-500">My Location :</strong>{{ lokasi.location[1].name }} - {{ lokasi.location[1].address }}
                     </p>
@@ -150,11 +161,13 @@
                         <i class="pi pi-building mr-2 text-xl text-red-500"></i> <strong class="mr-2 text-yellow-500">Destination :</strong>{{ lokasi.location[0].name }} - {{ lokasi.location[0].address }}
                     </p>
                 </div>
-                <div class="col-12 md:col-2 text-left md:text-right">
-                    <Button label="Check Point" icon="pi pi-compass" class="mb-2" @click="postData(lokasi.location[1].id,{current_latitude: lokasi.location[1].latitude, current_longitude: lokasi.location[1].longitude})"/>
+                <div class="w-full text-left md:text-right">
+                    <Button v-if="lokasi.attend == false" label="Check Point" icon="pi pi-compass" class="mb-2" @click="postData(lokasi.location[1].id,{current_latitude: lokasi.location[1].latitude, current_longitude: lokasi.location[1].longitude})"/>
+                    <span v-else class="text-green-500"><i class="pi pi-check mx-2 font-bold"></i>Check Point is <strong>Done</strong></span>
                 </div>
             </div>
             <map-check-point :data_dialog="lokasi.location"/>
         </Panel>
+        <Button label="Back" severity="secondary" icon="pi pi-times" outlined class="mt-4" @click="router.back()"/>
     </div>
 </template>
