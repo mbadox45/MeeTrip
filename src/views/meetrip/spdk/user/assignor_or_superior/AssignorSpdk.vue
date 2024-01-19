@@ -69,14 +69,14 @@
             const response = await User_SpdkApproveService.getPemberiTugas();
             const filteredData = response.data.data
             const data = filteredData.filter(item => item.status == '1');
-            // console.log(data)
+            console.log(data)
             const list = [];
             for (let i = 0; i < data.length; i++) {
                 let loc='';
                 if (data[i].destinations.length > 0) {
                     // console.log(data[i].destinations)
                     if (data[i].destinations.length > 1) {
-                        // const destination = data[i].destinations
+                        const destination = data[i].destinations
                         loc += '<ol>'
                         for (let a = 0; a < destination.length; a++) {
                             loc += `<li>${(await getLocationName(destination[a].latitude, destination[a].longitude)).formatted_address}</li>`
@@ -102,6 +102,7 @@
                     user:data[i].user,
                 };
             }
+            console.log(list)
             request_data.value = list;
             loadingTable2.value = false;
         } catch (error) {
