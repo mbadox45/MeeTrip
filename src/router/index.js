@@ -170,7 +170,10 @@ const router = createRouter({
                     component: () => import('@/views/meetrip/spdk/user/assignor_or_superior/AssignorSpdk.vue'),
                     meta:{
                         requiresAuth: true,
+                        superadmin:true,
                         user:true,
+                        adminsdm:true,
+                        adminga:true,
                         // superadmin:true,
                     }
                 },
@@ -180,7 +183,10 @@ const router = createRouter({
                     component: () => import('@/views/meetrip/spdk/user/assignor_or_superior/SuperiorSpdk.vue'),
                     meta:{
                         requiresAuth: true,
+                        superadmin:true,
                         user:true,
+                        adminsdm:true,
+                        adminga:true,
                         // superadmin:true,
                     }
                 },

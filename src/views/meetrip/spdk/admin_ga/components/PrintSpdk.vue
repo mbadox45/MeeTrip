@@ -94,125 +94,23 @@
 
     const cetakSPDK = async() => {
         if (labels.value == 'bto') {
-            await fetch(`${URL_API}pdf/${datas.id}/bto`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('usertoken')}`,
-                },
-            })
-            .then(response => response.blob())
-            .then(blob => {
-                // Create a blob URL for the attachment
-                const blobUrl = URL.createObjectURL(blob);
-
-                // Open a new tab with the blob URL
-                window.open(blobUrl, '_blank');
-                emit('submit','close')
-            }).catch(error => {
-                emit('submit','danger')
-                console.error('Error fetching attachment:', error)
-            });
+            window.open(`${URL_API}pdf/${datas.id}/bto`, '_blank');
         } else if (labels.value == 'bte') {
             if (detail_data.value.bteLuarNegeri == null) {
-                await fetch(`${URL_API}pdf/${datas.id}/bte-dalam-negeri`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('usertoken')}`,
-                    },
-                })
-                .then(response => response.blob())
-                .then(blob => {
-                    // Create a blob URL for the attachment
-                    const blobUrl = URL.createObjectURL(blob);
-    
-                    // Open a new tab with the blob URL
-                    window.open(blobUrl, '_blank');
-                    emit('submit','close')
-                }).catch(error => {
-                    emit('submit','danger')
-                    console.error('Error fetching attachment:', error)
-                });
+                window.open(`${URL_API}pdf/${datas.id}/bte-dalam-negeri`, '_blank');
             } else {
-                await fetch(`${URL_API}pdf/${datas.id}/bte-luar-negeri`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('usertoken')}`,
-                    },
-                })
-                .then(response => response.blob())
-                .then(blob => {
-                    // Create a blob URL for the attachment
-                    const blobUrl = URL.createObjectURL(blob);
-    
-                    // Open a new tab with the blob URL
-                    window.open(blobUrl, '_blank');
-                    emit('submit','close')
-                }).catch(error => {
-                    emit('submit','danger')
-                    console.error('Error fetching attachment:', error)
-                });
+                window.open(`${URL_API}pdf/${datas.id}/bte-luar-negeri`, '_blank');
             }
         } else if (labels.value == 'sj') {
-            await fetch(`${URL_API}pdf/${datas.id}/perintah-perjalanan-dinas`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('usertoken')}`,
-                },
-            })
-            .then(response => response.blob())
-            .then(blob => {
-                // Create a blob URL for the attachment
-                const blobUrl = URL.createObjectURL(blob);
-
-                // Open a new tab with the blob URL
-                window.open(blobUrl, '_blank');
-                emit('submit','close')
-            }).catch(error => {
-                emit('submit','danger')
-                console.error('Error fetching attachment:', error)
-            });
+            window.open(`${URL_API}pdf/${datas.id}/perintah-perjalanan-dinas`, '_blank');
         } else if (labels.value == 'att') {
             const modifiedURL = URL_API.replace(/\/$/, '');
             window.open(`${modifiedURL}${detail_data.value.lampiran}`,'_blank');
         } else {
             if (detail_data.value.dpLuarNegeri == null) {
-                await fetch(`${URL_API}pdf/${datas.id}/pengajuan-panjar-dalam-negeri`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('usertoken')}`,
-                    },
-                })
-                .then(response => response.blob())
-                .then(blob => {
-                    // Create a blob URL for the attachment
-                    const blobUrl = URL.createObjectURL(blob);
-    
-                    // Open a new tab with the blob URL
-                    window.open(blobUrl, '_blank');
-                    emit('submit','close')
-                }).catch(error => {
-                    emit('submit','danger')
-                    console.error('Error fetching attachment:', error)
-                });
+                window.open(`${URL_API}pdf/${datas.id}/pengajuan-panjar-dalam-negeri`, '_blank');
             } else {
-                await fetch(`${URL_API}pdf/${datas.id}/pengajuan-panjar-luar-negeri`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('usertoken')}`,
-                    },
-                })
-                .then(response => response.blob())
-                .then(blob => {
-                    // Create a blob URL for the attachment
-                    const blobUrl = URL.createObjectURL(blob);
-    
-                    // Open a new tab with the blob URL
-                    window.open(blobUrl, '_blank');
-                    emit('submit','close')
-                }).catch(error => {
-                    emit('submit','danger')
-                    console.error('Error fetching attachment:', error)
-                });
+                window.open(`${URL_API}pdf/${datas.id}/pengajuan-panjar-luar-negeri`, '_blank');
             }
         }
     }
