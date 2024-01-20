@@ -240,10 +240,6 @@
                     <div class="w-full">
                         <h6 class="text-2xl">Need to Approve - Business Trip Expenses (BTE)</h6>
                     </div>
-                    <div class="w-full flex justify-content-end gap-2">
-                        <Button type="button" icon="pi pi-ellipsis-v" text @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" />
-                        <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
-                    </div>
                 </div>
                 <Divider/>
                 <div v-show="loadingTable2 == true" class="text-center">

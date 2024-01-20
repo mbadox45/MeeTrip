@@ -15,14 +15,16 @@ export const menu_300 = (func) => {
     return list;
 }
 
-export const menu_301 = (func) => {
+export const menu_301 = (func) => { //di update
     const list = [
-        {label: 'Submit DP', icon: 'pi pi-fw pi-check-circle', command: () => func[0]()},
-        {label: 'Edit DP', icon: 'pi pi-fw pi-pencil', command: () => func[1]()},
-        {label: 'Cancel BTO', icon: 'pi pi-fw pi-times', command: () => func[2]()},
+        {label: 'Detail SPDK', icon: 'pi pi-fw pi-search', command: () => func[0]()},
         {separator:true},
-        {label: 'Print', icon: 'pi pi-fw pi-print', command: () => func[3]()},
-        {label: 'Timeline', icon: 'pi pi-fw pi-list', command: () => func[4]()},
+        {label: 'Submit DP', icon: 'pi pi-fw pi-check-circle', command: () => func[1]()},
+        {label: 'Edit DP', icon: 'pi pi-fw pi-pencil', command: () => func[2]()},
+        {label: 'Cancel BTO', icon: 'pi pi-fw pi-times', command: () => func[3]()},
+        {separator:true},
+        {label: 'Print', icon: 'pi pi-fw pi-print', command: () => func[4]()},
+        {label: 'Timeline', icon: 'pi pi-fw pi-list', command: () => func[5]()},
     ]
 
     return list;
@@ -53,15 +55,17 @@ export const menu_302_admin = (func) => {
     return list;
 }
 
-export const menu_303 = (func) => {
+export const menu_303 = (func) => { //di update
     const list = [
-        {label: 'Submit DP', icon: 'pi pi-fw pi-check-circle', command: () => func[0]()},
-        {label: 'Edit DP', icon: 'pi pi-fw pi-pencil', command: () => func[1]()},
-        {label: 'Cancel BTO', icon: 'pi pi-fw pi-times', command: () => func[2]()},
-        {label: 'Revision Information', icon: 'pi pi-fw pi-bookmark', command: () => func[3]()},
+        {label: 'Detail SPDK', icon: 'pi pi-fw pi-search', command: () => func[0]()},
         {separator:true},
-        {label: 'Print', icon: 'pi pi-fw pi-print', command: () => func[4]()},
-        {label: 'Timeline', icon: 'pi pi-fw pi-list', command: () => func[5]()},
+        {label: 'Submit DP', icon: 'pi pi-fw pi-check-circle', command: () => func[1]()},
+        {label: 'Edit DP', icon: 'pi pi-fw pi-pencil', command: () => func[2]()},
+        {label: 'Cancel BTO', icon: 'pi pi-fw pi-times', command: () => func[3]()},
+        {label: 'Revision Information', icon: 'pi pi-fw pi-bookmark', command: () => func[4]()},
+        {separator:true},
+        {label: 'Print', icon: 'pi pi-fw pi-print', command: () => func[5]()},
+        {label: 'Timeline', icon: 'pi pi-fw pi-list', command: () => func[6]()},
     ]
 
     return list;
@@ -76,6 +80,19 @@ export const menu_0_or_12 = (func) => {
     ]
 
     return list;
+}
+
+export const menu_all_spdk = (func) => { //di update
+    const list = [
+        {label: 'Detail SPDK', icon: 'pi pi-fw pi-search', command: () => func[0]()},
+        {label: 'Edit BTO', icon: 'pi pi-fw pi-pencil', command: () => func[1]()},
+        {separator:true},
+        {label: 'Print', icon: 'pi pi-fw pi-print', command: () => func[2]()},
+        {label: 'Timeline', icon: 'pi pi-fw pi-list', command: () => func[3]()},
+    ]
+
+    return list;
+
 }
 
 export const menu_2 = (func) => {

@@ -5,7 +5,7 @@ import { onMounted, ref } from 'vue';
 import AppMenuItem from './AppMenuItem.vue';
 
 // API
-import { menu_superadmin, menu_adminsdm, menu_adminga, menu_admincnb, menu_user, menu_user_approve, menu_admincs } from '@/api/DataVariable.js';
+import { menu_superadmin, menu_adminsdm, menu_adminsdm_approve, menu_adminga, menu_adminga_approve, menu_admincnb, menu_user, menu_user_approve, menu_admincs } from '@/api/DataVariable.js';
 
 const payload = ref(JSON.parse(localStorage.getItem('payload')));
 const token = localStorage.getItem('usertoken');
@@ -24,9 +24,17 @@ const Menu = () => {
     if (roles == 'superadmin') {
         model.value = menu_superadmin;
     } else if (roles == 'adminsdm') {
-        model.value = menu_adminsdm;
+        if (payload.value.grade >= 3) {
+            model.value = menu_adminsdm_approve;
+        } else {
+            model.value = menu_adminsdm;
+        }
     } else if (roles == 'adminga') {
-        model.value = menu_adminga;
+        if (payload.value.grade >= 3) {
+            model.value = menu_adminga_approve;
+        } else {
+            model.value = menu_adminga;
+        }
     } else if (roles == 'admincnb') {
         model.value = menu_admincnb;
     } else if (roles == 'admincs') {

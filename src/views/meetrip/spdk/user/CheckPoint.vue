@@ -70,10 +70,10 @@
 
     const postData = async (id_dest, data_dest) => {
         console.log(id_dest, data_dest)
-        // data_dest = {
-        //     current_latitude : 3.586066, 
-        //     current_longitude : 98.661165
-        // }
+        data_dest = {
+            current_latitude : 3.1319965,
+            current_longitude : 99.3425704
+        }
         try {
             const response = await User_PelaksanaService.putAttendSPDK(id_dest, data_dest);
             const data = response.data;

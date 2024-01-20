@@ -4,6 +4,26 @@ export const mata_uang = [
     {id:38, wilayah:'luar wilayah', jabatan:2, pagi:50000, siang:50000, malam:50000, hotel:500000, laundry:25000, pp:0, transport_lokal:250000, saku:150000, komunikasi:0, airport:400000, official:0}
 ];
 
+export const bg_color = [
+    {status:'0', color:'red-600'},
+    {status:'300', color:'cyan-500'},
+    {status:'301', color:'cyan-700'},
+    {status:'302', color:'teal-500'},
+    {status:'303', color:'cyan-700'},
+    {status:'1', color:'blue-500'},
+    {status:'2', color:'orange-400'},
+    {status:'3', color:'gray-500'},
+    {status:'4', color:'gray-500'},
+    {status:'5', color:'indigo-500'},
+    {status:'6', color:'yellow-500'},
+    {status:'7', color:'yellow-800'},
+    {status:'8', color:'yellow-800'},
+    {status:'9', color:'purple-500'},
+    {status:'10', color:'blue-500'},
+    {status:'11', color:'yellow-800'},
+    {status:'12', color:'green-500'},
+]
+
 export const kendaraan = [
     { name: 'Public Transport', kendaraan:'', icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-bus-front mr-2" viewBox="0 0 16 16">
                                         <path d="M5 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-6-1a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2H7Zm1-6c-1.876 0-3.426.109-4.552.226A.5.5 0 0 0 3 4.723v3.554a.5.5 0 0 0 .448.497C4.574 8.891 6.124 9 8 9c1.876 0 3.426-.109 4.552-.226A.5.5 0 0 0 13 8.277V4.723a.5.5 0 0 0-.448-.497A44.303 44.303 0 0 0 8 4Zm0-1c-1.837 0-3.353.107-4.448.22a.5.5 0 1 1-.104-.994A44.304 44.304 0 0 1 8 2c1.876 0 3.426.109 4.552.226a.5.5 0 1 1-.104.994A43.306 43.306 0 0 0 8 3Z"/>

@@ -9,6 +9,7 @@
     import User_SpdkFormService from '@/api/user/SpdkFormService.js';
     import { URL_WEB, GOOGLE_MAPS_API_KEYS } from '@/api/env';
     import { getLocationName } from '@/api/gmaps/MapsService'
+    import {bg_color} from '@/api/Databodong.js';
 
     
     // Component
@@ -90,6 +91,7 @@
                 } else {
                     loc = `<span>${data[i].tujuan}</span>`;
                 }
+                const colors = bg_color.find(item => item.status === data[i].status);
                 list[i] = {
                     id: data[i].id,
                     submit_date: moment(data[i].created_at).format('DD MMMM YYYY'),
@@ -100,6 +102,7 @@
                     meta:data[i].meta,
                     note:data[i].note,
                     user:data[i].user,
+                    color: colors
                 };
             }
             request_data.value = list;
@@ -121,11 +124,11 @@
         if (selectedRequest.value.status == 300) {
             menuModel.value = menu_300([() => detailData(selectedRequest.value, 'detail'), () => router.push(`/dp-bto/${selectedRequest.value.id}`), () => window.open(URL_WEB+'print/'+selectedRequest.value.id), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'cancel'), () => detailData(selectedRequest.value, 'print'),() => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 301) {
-            menuModel.value = menu_301([() => detailData(selectedRequest.value, 'submit_dp'), () => detailData(selectedRequest.value, 'edit_dp'), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
+            menuModel.value = menu_301([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'submit_dp'), () => detailData(selectedRequest.value, 'edit_dp'), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 302) {
             menuModel.value = menu_302([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'cancel'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 303) {
-            menuModel.value = menu_303([() => detailData(selectedRequest.value, 'submit_dp'), () => detailData(selectedRequest.value, 'edit_dp'), () => detailData(selectedRequest.value, 'cancel'), () => detailData(selectedRequest.value, 'info'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
+            menuModel.value = menu_303([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'submit_dp'), () => detailData(selectedRequest.value, 'edit_dp'), () => detailData(selectedRequest.value, 'cancel'), () => detailData(selectedRequest.value, 'info'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 6) {
             menuModel.value = menu_6([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'check_point'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 7) {
@@ -241,7 +244,7 @@
                         <h6 class="text-2xl">My Business Trip Order (BTO)</h6>
                     </div>
                     <div class="w-full flex justify-content-end gap-2">
-                        <Button type="button" icon="pi pi-ellipsis-v" text @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" />
+                        <Button type="button" icon="pi pi-cog text-2xl" rounded @click="toggle" aria-haspopup="true" severity="info" aria-controls="overlay_menu" />
                         <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
                     </div>
                 </div>
@@ -266,7 +269,7 @@
                         </Column>
                         <Column field="info" header="Status" class="min-w-10">
                             <template #body="{ data }">
-                                {{ data.info.toUpperCase() }}
+                                <div :class="`bg-${data.color.color} p-2 text-white font-semibold border-round text-md uppercase`">{{ data.info }}</div>
                             </template>
                         </Column>
                     </DataTable>

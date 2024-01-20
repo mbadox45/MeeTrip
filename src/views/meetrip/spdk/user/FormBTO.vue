@@ -20,10 +20,10 @@
     // Variable
     const formID = route.query.id
     const list_atasan = ref([]);
-    const lampiran = ref();
+    const loading = ref(true);
     const roles = ref(localStorage.getItem('roles'));
     const payload = ref(JSON.parse(localStorage.getItem('payload')));
-    const form = ref({id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]})
+    const form = ref({id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'-', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]})
     const kendaraan_list = ref(kendaraan);
     const dp_list = ref(down_payment);
     const visible = ref(false);
@@ -31,7 +31,6 @@
         {locate:null, list_location:[], placeholder:'Start Location'}, 
         {locate:null, list_location:[], placeholder:'Destination Location'}
     ])
-    // const fileInput = ref(null)
     const start_location = ref(null)
     const destination_location = ref(null)
     const list_start_location = ref([])
@@ -101,13 +100,15 @@
     
     const load_data = async () => {
         if (formID == null) {
-            loadUser();
+            await loadUser();
             reset_form();
             console.log(formID);
+            loading.value = false;
         } else {
             await load_spdk()
             await loadUser();
             console.log(formID);
+            loading.value = false;
         }
     }
 
@@ -123,7 +124,7 @@
     };
 
     const reset_form = () => {
-        form.value = {id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]}
+        form.value = {id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'-', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]}
     }
 
     const addsForm = () => {
@@ -149,7 +150,7 @@
                     if (grade > Number(payload.value.grade)) {
                         list_atasan.value.push({
                             id: data[i].id,
-                            name: data[i].name +' - '+data[i].divisi,
+                            name: data[i].name +' - '+data[i].jabatan,
                             grade: grade,
                         })
                     }
@@ -361,7 +362,11 @@
                 <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> My BTO <i class="pi pi-angle-double-right mx-2"></i> {{formID == null ? 'Form' : 'Edit'}} BTO</strong>
             </div>
         </div>
-        <div class="card shadow-4">
+        <div v-show="loading == true" class="text-center">
+            <h3>Loading...</h3>
+            <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
+        </div>
+        <div v-show="loading == false" class="card shadow-4">
             <div class="grid">
                 <div class="col-12 md:col-12 p-fluid">
                     <p class="text-lg font-semibold text-gray-500">ASSIGNOR</p>
@@ -405,7 +410,7 @@
                                     <i class="pi pi-calendar"></i>
                                 </span>
                                 <InputText type="date" v-if="formID != null && roles == 'adminga'" v-model="form.tgl_berangkat" placeholder=""/>
-                                <InputText type="date" v-else v-model="form.tgl_berangkat" :min="moment(new Date).format('YYYY-MM-DD')" placeholder=""/>
+                                <InputText type="date" v-else v-model="form.tgl_berangkat" :min="moment(new Date).format('YYYY-MM-DD')" :class="{ 'p-invalid': errorMessage }" placeholder=""/>
                             </div>
                         </div>
                         <div class="col-12 md:6">
@@ -455,7 +460,7 @@
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-users"></i>
                         </span>
-                        <InputText v-model="form.rombongan" placeholder="Exp: Rombongan komunitas"/>
+                        <InputText v-model="form.rombongan" placeholder="Exp: Rombongan komunitas" disabled/>
                     </div>
                 </div>
                 <div class="col-12 md:col-4 p-fluid">

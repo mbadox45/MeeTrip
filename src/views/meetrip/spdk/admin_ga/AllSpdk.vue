@@ -1,6 +1,7 @@
 <script setup>
     import { onMounted, ref } from 'vue';
     import { useRouter, useRoute } from 'vue-router';
+    import { FilterMatchMode } from 'primevue/api';
     import moment from 'moment';
     import { useToast } from 'primevue/usetoast';
     import axios from 'axios';
@@ -8,10 +9,11 @@
     // API
     import Admin_SpdkAdminService from '@/api/admin/SpdkAdminService.js';
     import { URL_WEB, GOOGLE_MAPS_API_KEYS } from '@/api/env';
+    import {bg_color} from '@/api/Databodong.js';
 
     
     // Component
-    import {menu_302_admin, menu_2, menu_3, menu_4, menu_0_or_12} from '@/api/components/ListMenu.js';
+    import {menu_all_spdk} from '@/api/components/ListMenu.js';
     // Component Admin GA
     import ApproveSpdk from '@/views/meetrip/spdk/admin_ga/components/ApproveSpdk.vue';
     import RevisiSpdk from '@/views/meetrip/spdk/admin_ga/components/RevisiSpdk.vue';
@@ -38,6 +40,7 @@
     const titledialogs = ref();
     const statusRequest = ref('');
     const menu = ref();
+    const search = ref({global: { value: null, matchMode: FilterMatchMode.CONTAINS }});
     const GOOGLE_MAPS_API_KEY = GOOGLE_MAPS_API_KEYS;
     const items = ref([
         {
@@ -92,6 +95,7 @@
             const response = await Admin_SpdkAdminService.getSPDK();
             const data = response.data.data;
             const list = [];
+            console.log(data)
             for (let i = 0; i < data.length; i++) {
                 let loc='';
                 if (data[i].destinations.length > 0) {
@@ -108,6 +112,8 @@
                 } else {
                     loc = `<span>${data[i].tujuan}</span>`;
                 }
+                const colors = bg_color.find(item => item.status === data[i].status);
+                // console.log(colors)
                 list[i] = {
                     id: data[i].id,
                     submit_date: moment(data[i].created_at).format('DD MMMM YYYY'),
@@ -121,6 +127,8 @@
                     nama_supir:data[i].nama_supir,
                     no_kendaraan:data[i].no_kendaraan,
                     user:data[i].user,
+                    color: colors,
+                    created_at:moment(data[i].created_at).format('DD MMMM YYYY - HH:mm:ss'),
                 };
             }
             loadingTable2.value = false
@@ -139,7 +147,7 @@
         loadMenu();
     };
     const loadMenu = () => {
-        menuModel.value = menu_0_or_12([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
+        menuModel.value = menu_all_spdk([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
     }
 
     // Dialog Function
@@ -244,7 +252,13 @@
             <div class="card border-round-md">
                 <div class="flex justify-content-between align-items-center">
                     <div class="w-full">
-                        <h6 class="text-2xl">List SPDK</h6>
+                        <i class="pi pi-download text-2xl font-bold hover:text-pink-500 cursor-pointer" v-tooltip.bottom="`Export to Excel`"></i>
+                    </div>
+                    <div class="p-fluid w-full">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search" />
+                            <InputText v-model="search['global'].value" placeholder="Search [ Reference Number, Requestor, Destination, Information ]" clea/>
+                        </span>
                     </div>
                 </div>
                 <Divider/>
@@ -254,7 +268,8 @@
                 </div>
                 <div v-show=" loadingTable2 == false">
                     <ContextMenu ref="cm" :model="menuModel"></ContextMenu>
-                    <DataTable :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" tableStyle="min-width: 50rem">
+                    <DataTable v-model:filters="search" :value="request_data" paginator :rows="10" contextMenu v-model:contextMenuSelection="selectedRequest" @rowContextmenu="onRowContextMenu" tableStyle="min-width: 50rem"
+                    :globalFilterFields="['nomor_surat', 'user.name', 'destination', 'info']">
                         <template #empty><p class="text-center"> Data not found. </p></template>
                         <Column field="nomor_surat" header="Reference Number" style="min-width: 12rem">
                             <template #body="{ data }">
@@ -273,7 +288,12 @@
                         </Column>
                         <Column field="info" header="Information" style="min-width: 12rem">
                             <template #body="{ data }">
-                                <div class="bg-cyan-500 p-2 text-white font-semibold border-round text-sm">{{ data.info }}</div>
+                                <div :class="`bg-${data.color.color} p-2 text-white font-semibold border-round text-sm`">{{ data.info }}</div>
+                            </template>
+                        </Column>
+                        <Column field="created_at" header="Created Date" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <div>{{ data.created_at }}</div>
                             </template>
                         </Column>
                     </DataTable>
