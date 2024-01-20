@@ -5,6 +5,7 @@
     // API
     import User_SpdkFormService from '@/api/user/SpdkFormService';
     import { getDescLoc, getLocationName } from '@/api/gmaps/MapsService'
+    import { kendaraan } from '@/api/Databodong';
 
     // Variable
     const props = defineProps({
@@ -16,7 +17,7 @@
     const datas = props.data_dialog;
     const loading = ref(false);
     // const payload = ref(JSON.parse(localStorage.getItem('payload')));
-    const loads = ref({name:null, jabatan:null, wilayah:null, nomor_surat:null, atasan:null, lama_hari:null, berangkat:null, kembali: null, info: null, pemberitugas:null})
+    const loads = ref({name:null, jabatan:null, wilayah:null, nomor_surat:null, atasan:null, lama_hari:null, berangkat:null, kembali: null, info: null, pemberitugas:null, kendaraan:null, keperluan:null})
     const destination = ref([])
     const destination2 = ref(null)
 
@@ -25,6 +26,7 @@
         try {
             const response = await User_SpdkFormService.getDetailMySPDK(datas.id)
             const load = response.data.data
+            const transport = kendaraan.find(item => item.kendaraan == load.kendaraan)
             console.log(load);
             // Loads
             loads.value.name = load.user.name;
@@ -34,8 +36,10 @@
             loads.value.info = load.info;
             loads.value.nomor_surat = load.nomor_surat;
             loads.value.lama_hari = load.lama_hari;
+            loads.value.keperluan = load.keperluan;
             loads.value.berangkat = moment(`${load.tgl_berangkat} ${load.jam_pergi}`).format('DD MMM YYYY - HH:mm:ss');
             loads.value.kembali =  moment(`${load.tgl_kembali} ${load.jam_pergi}`).format('DD MMM YYYY - HH:mm:ss');
+            loads.value.kendaraan = transport.name;
 
             // Destination
             if (load.destinations.length > 0) {
@@ -111,6 +115,8 @@
                 <div class="col-8">: {{ loads.atasan }}</div> -->
             </div>
             <div class="col-12 md:col-6 grid">
+                <div class="col-4 font-semibold">Transport Type</div>
+                <div class="col-8">: {{ loads.kendaraan }}</div>
                 <div class="col-4 font-semibold">Departure</div>
                 <div class="col-8">: {{ loads.berangkat }} WIB</div>
                 <div class="col-4 font-semibold">Arrival</div>
@@ -137,8 +143,10 @@
             <span class="font-bold text-lg text-yellow-500"><i class="pi pi-shield mr-2"></i> ETC</span>
         </Divider>
         <div class="grid">
+            <div class="col-4 md:col-2 font-semibold">Needs</div>
+            <div class="col-8 md:col-10">: {{ loads.keperluan }}</div>
             <div class="col-4 md:col-2 font-semibold">Info</div>
-            <div class="col-8 md:col-10">: {{ loads.info }}</div>
+            <div class="col-8 md:col-10">: <span class="text-red-500 font-semibold">{{ loads.info }}</span></div>
         </div>
     </div>
 </template>

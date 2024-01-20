@@ -83,7 +83,7 @@
         const circle = new google.maps.Circle({
             map: map.value,
             center: id_place,
-            radius: 100, // Set the radius in meters (adjust as needed)
+            radius: 500, // Set the radius in meters (adjust as needed)
             fillColor: '#F1948A', // Set the fill color
             fillOpacity: 0.3, // Set the fill opacity
             strokeColor: '#F1948A', // Set the stroke color
