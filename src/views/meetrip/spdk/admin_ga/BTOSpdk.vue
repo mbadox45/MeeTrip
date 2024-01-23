@@ -251,10 +251,10 @@
             <div class="flex align-items-center justify-content-end md:justify-content-between">
                 <div class="">
                     <i class="mr-4 text-2xl md:text-5xl pi pi-car"></i>
-                    <strong class="text-2xl md:text-5xl font-normal">BTO - {{ routes == '/bto-spdk' ? 'Approve' : 'Surat Jalan' }}</strong>
+                    <strong class="text-2xl md:text-5xl font-normal">BTO - {{ routes == '/bto-spdk' ? 'Down Payment' : 'Surat Jalan' }}</strong>
                 </div>
                 <div class="hidden md:block">
-                    <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> BTO - {{ routes == '/bto-spdk' ? 'Approve' : 'Surat Jalan' }} <i class="pi pi-angle-double-right mx-2" v-show="payload.type != 'adminga'"></i> {{payload.type == 'adminga' ? null: 'Human Capital'}}</strong>
+                    <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> BTO - {{ routes == '/bto-spdk' ? 'Down Payment' : 'Surat Jalan' }} <i class="pi pi-angle-double-right mx-2" v-show="payload.type != 'adminga'"></i> {{payload.type == 'adminga' ? null: 'Human Capital'}}</strong>
                 </div>
             </div>
         </div>

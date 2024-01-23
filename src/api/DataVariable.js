@@ -109,9 +109,9 @@ export const menu_adminga = [
             { label: 'My SPDK', icon: 'pi pi-fw pi-briefcase', to: '/my-spdk' },
             { label: 'Approval', icon: 'pi pi-fw pi-check-circle',
                 items: [
-                    { label: 'Down Payment', icon: 'pi pi-fw pi-dollar', to: '/dp-spdk' },
-                    { label: 'BTO', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
-                    { label: 'Travel Document', icon: 'pi pi-fw pi-inbox', to: '/surat-jalan' },
+                    // { label: 'Down Payment', icon: 'pi pi-fw pi-dollar', to: '/dp-spdk' },
+                    { label: 'Down Payment', icon: 'pi pi-fw pi-dollar', to: '/bto-spdk' },
+                    { label: 'BTO', icon: 'pi pi-fw pi-inbox', to: '/surat-jalan' },
                     { label: 'BTE', icon: 'pi pi-fw pi-box', to: '/bte-spdk' },
                     { label: 'Disbursement', icon: 'pi pi-fw pi-money-bill', to: '/disbursement-spdk' },
                 ]
