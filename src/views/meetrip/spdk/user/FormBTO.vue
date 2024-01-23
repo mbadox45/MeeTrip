@@ -311,9 +311,9 @@
             if (fileInput.files.length > 0) {
                 formData.append('lampiran', document.getElementById('lampiran_ID').files[0]);
                 if (formID != null) {
-                    const response = await User_SpdkFormService.putUpdateMySPDK(formID,formData).then(res => {
+                    await User_SpdkFormService.putUpdateMySPDK(formID,formData).then(res => {
                         const load = res.data;
-                        if (load.status == true) {
+                        if (load.success == true) {
                             reset_form();
                             messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
                             loading.value = true;
@@ -324,13 +324,14 @@
                             messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
                         }
                     }).catch(error => {
-                        messagess.value = [{ severity: 'danger', content: 'Please confirm to ICT Development.', id: count.value++ },];
+                        messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
                         console.error(error.response.status);
                     })
                 } else {
                     await User_SpdkFormService.postAddMySPDK(formData).then(res => {
                         const load = res.data;
-                        if (load.status == true) {
+                        console.log(load)
+                        if (load.success == true) {
                             reset_form();
                             messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
                             loading.value = true;
@@ -341,7 +342,7 @@
                             messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
                         }
                     }).catch(error => {
-                        messagess.value = [{ severity: 'danger', content: 'Please confirm to ICT Development.', id: count.value++ },];
+                        messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
                         console.error(error.response.status);
                     })
                 }
@@ -352,9 +353,9 @@
                     const fileName = form.value.lampiran.split('/').pop();
                     formData.append('lampiran', imageBlob, fileName);
                     if (formID != null) {
-                        const response = await User_SpdkFormService.putUpdateMySPDK(formID,formData).then(res => {
+                        await User_SpdkFormService.putUpdateMySPDK(formID,formData).then(res => {
                             const load = res.data;
-                            if (load.status == true) {
+                            if (load.success == true) {
                                 reset_form();
                                 messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
                                 loading.value = true;
@@ -365,13 +366,13 @@
                                 messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
                             }
                         }).catch(error => {
-                            messagess.value = [{ severity: 'danger', content: 'Please confirm to ICT Development.', id: count.value++ },];
+                            messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
                             console.error(error.response.status);
                         })
                     } else {
                         await User_SpdkFormService.postAddMySPDK(formData).then(res => {
                             const load = res.data;
-                            if (load.status == true) {
+                            if (load.success == true) {
                                 reset_form();
                                 messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
                                 loading.value = true;
@@ -382,7 +383,7 @@
                                 messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
                             }
                         }).catch(error => {
-                            messagess.value = [{ severity: 'danger', content: 'Please confirm to ICT Development.', id: count.value++ },];
+                            messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
                             console.error(error.response.status);
                         })
                     }
