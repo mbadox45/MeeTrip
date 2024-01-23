@@ -135,7 +135,7 @@ const router = createRouter({
                 {
                     path: '/surat-jalan',
                     name: 'surat-jalan',
-                    component: () => import('@/views/meetrip/spdk/admin_ga/BTOSpdk.vue'),
+                    component: () => import('@/views/meetrip/spdk/admin_ga/SuratSpdk.vue'),
                     meta:{
                         requiresAuth: true,
                         superadmin:true,
