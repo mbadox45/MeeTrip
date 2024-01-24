@@ -1,5 +1,8 @@
 <template>
     <div>
+        <!-- <p class="mt-3">
+            <i class="pi pi-arrow-right-arrow-left mr-2 text-xl text-red-500"></i> <strong class="mr-2 text-cyan-500">Distance :</strong> <span class="font-semibold">{{ jarak }} Meters</span>
+        </p> -->
         <div ref="mapDiv" style="width: 100%; height: 500px;"></div>
     </div>
 </template>
@@ -30,6 +33,7 @@
     let map = ref(null);
     // const distances = ref(null);
     let distances = null;
+    const jarak = ref(null)
     const load_data = props.data_dialog;
     
     onMounted(() => {
@@ -96,7 +100,9 @@
 
         // Call fitBounds with the calculated bounds
         map.value.fitBounds(bounds);
-        distances = await calculateDistance(markers[0].getPosition(), markers[1].getPosition())
+        // distances = await calculateDistance(markers[0].getPosition(), markers[1].getPosition())
+        jarak.value = parseFloat(Number(await calculateDistance(markers[0].getPosition(), markers[1].getPosition())).toFixed(2));
+        // console.log(jarak.value)
     };
 
     const createMarker = (latlng, map, label) => {

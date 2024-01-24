@@ -87,7 +87,7 @@
             const filteredData = response.data.data
             let data;
             if (payload.value.type == 'adminga') {
-                data = filteredData.filter(item => Number(item.status) == 9);
+                data = filteredData.filter(item => Number(item.status) == 11);
             } else {
                 data = filteredData.filter(item => Number(item.status) == 11);
             }
@@ -226,11 +226,11 @@
         <div class="col-12 md:col-12">
             <div class="flex align-items-center justify-content-end md:justify-content-between">
                 <div class="">
-                    <i class="mr-4 text-2xl md:text-5xl pi pi-car"></i>
-                    <strong class="text-2xl md:text-5xl font-normal">BTE - Approve</strong>
+                    <i class="mr-4 text-2xl md:text-5xl pi pi-money-bill"></i>
+                    <strong class="text-2xl md:text-5xl font-normal">Disbursement - Approve</strong>
                 </div>
                 <div class="hidden md:block">
-                    <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> BTE - Approve <i class="pi pi-angle-double-right mx-2" v-show="payload.type != 'adminga'"></i> {{payload.type == 'adminga' ? null: 'Human Capital'}}</strong>
+                    <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> Disbursement - Approve <i class="pi pi-angle-double-right mx-2" v-show="payload.type != 'adminga'"></i> {{payload.type == 'adminga' ? null: 'Human Capital'}}</strong>
                 </div>
             </div>
         </div>
@@ -238,7 +238,7 @@
             <div class="card border-round-md">
                 <div class="flex justify-content-between align-items-center">
                     <div class="w-full">
-                        <h6 class="text-2xl">Need to Approve - Business Trip Expenses (BTE)</h6>
+                        <h6 class="text-2xl">Need to Disbursement</h6>
                     </div>
                 </div>
                 <Divider/>

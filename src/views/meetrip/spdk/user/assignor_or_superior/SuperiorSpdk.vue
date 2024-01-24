@@ -63,6 +63,7 @@
     };
     
     const aksi = async () => {
+        loadingTable2.value = true
         // loadingTable.value = 'Loading'
         try {
             const response = await User_SpdkApproveService.getAtasan();

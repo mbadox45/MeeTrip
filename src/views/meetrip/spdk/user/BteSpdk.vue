@@ -18,10 +18,13 @@
     const dis_form = ref({sarapan:null, makan_malam:null, makan_siang:null, airport:null, uang_saku:null, uang_hotel:null, uang_laundry:null, uang_transport_dilokasi:null, uang_tiket:null, uang_pp:null, uang_komunikasi:null, lain:[], nilai_lain:[]})
     const form = ref({id:null, kurs_usd:0, sarapan:null, makan_siang:null, makan_malam:null, airport:null, uang_saku:null, uang_hotel:null, uang_laundry:null, uang_transport_dilokasi:null, uang_tiket:null, uang_pp:null, uang_komunikasi:null, lain:[], nilai_lain:[]})
     const lain_lain = ref([{lain:null, nilai:null}])
+    const loadingTable2 = ref(true)
 
     const router = useRouter();
     const route = useRoute();
     const toast = useToast();
+
+    const formID = route.query.type
 
     const detailSpdk = async () => {
         const id = route.params.id;
@@ -32,6 +35,7 @@
 
     const uangDP = async () => {
         // Load SPDK By ID in Route
+        loadingTable2.value = true
         const spdk = await detailSpdk();
         dataSPDK.value = spdk;
         console.log(spdk)
@@ -44,6 +48,7 @@
         const region =  wilayah.value[Number(spdk.wilayah)-1]
         const filteredData = data.filter(item => item.wilayah === region && item.jabatan === spdk.golongan);
         console.log(filteredData[0])
+        
         dis_form.value = {
             sarapan: calculateConsumtionMax(spdk, filteredData[0].pagi, 'pagi'),
             makan_malam: calculateConsumtionMax(spdk, filteredData[0].malam, 'malam'),
@@ -54,12 +59,32 @@
             uang_hotel: hotelCalculate(spdk, filteredData[0].hotel),
             uang_laundry: hotelCalculate(spdk, filteredData[0].laundry),
             uang_komunikasi: localTransport(spdk, filteredData[0].komunikasi),
+            uang_tiket: filteredData[0].tiket,
         };
         console.log(dis_form.value);
         
         // Get Kurs
         await kursUSD(Number(spdk.wilayah));
-    } 
+
+        if (formID != null) {
+            await load_edit(spdk)
+        }
+        loadingTable2.value = false
+    }
+
+    const load_edit = async (data) => {
+        form.value.uang_hotel = data.uang_hotel
+        form.value.uang_laundry = data.uang_laundry
+        form.value.uang_komunikasi = data.uang_komunikasi
+        form.value.uang_transport_dilokasi = data.uang_transport_dilokasi
+        form.value.uang_pp = data.uang_pp
+        form.value.uang_tiket = dis_form.value.uang_tiket
+        form.value.uang_saku = data.uang_saku
+        form.value.sarapan = data.uang_makan >= dis_form.value.sarapan ? dis_form.value.sarapan : data.uang_makan
+        form.value.makan_siang = data.uang_makan >= dis_form.value.makan_siang ? dis_form.value.makan_siang : data.uang_makan
+        form.value.makan_malam = data.uang_makan >= dis_form.value.makan_malam ? dis_form.value.makan_malam : data.uang_makan
+        form.value.airport = Number(data.airport)
+    }
 
     const load_data = async () => {
         await uangDP()
@@ -92,25 +117,58 @@
 
     const postData = async (ket) => {
         if (ket == 'save') {
-            const test = lain_lain.value;
-            const lain = []
-            const nilai = []
-            for (let i = 0; i < test.length; i++) {
-                nilai[i] = test[i].nilai
-                lain[i] = test[i].lain
-            }
-            form.value.uang_komunikasi = form.value.komunikasi == null ? 0 : form.value.komunikasi
-            form.value.uang_pp = form.value.uang_pp == null ? 0 : form.value.uang_pp
-            form.value.lain = lain
-            form.value.nilai_lain = nilai
-
-            const id = route.params.id;
-            const response = await User_PelaksanaService.postCreateBTE(id, form.value)
-            const data = response.data;
-            if (data.success == true) {
-                toast.add({ severity: 'success', summary: 'Successfully', detail: `Create BTE successfully`, life: 3000 });
+            if ( form.value.sarapan != null && form.value.makan_siang != null && form.value.makan_malam != null && form.value.airport != null && form.value.uang_saku != null && form.value.uang_hotel != null && form.value.uang_laundry != null && form.value.uang_transport_dilokasi != null && form.value.uang_tiket != null && form.value.uang_pp != null) {
+                const test = lain_lain.value;
+                const lain = []
+                const nilai = []
+                for (let i = 0; i < test.length; i++) {
+                    nilai[i] = test[i].nilai
+                    lain[i] = test[i].lain
+                }
+                form.value.uang_komunikasi = form.value.komunikasi == null ? 0 : form.value.komunikasi
+                form.value.uang_pp = form.value.uang_pp == null ? 0 : form.value.uang_pp
+                form.value.lain = lain
+                form.value.nilai_lain = nilai
+    
+                const id = route.params.id;
+                if (formID != null) {
+                    await User_PelaksanaService.putUpdateBTE(id, form.value).then(res => {
+                        const load = res.data;
+                        if (load.success == true) {
+                            reset_form();
+                            loadingTable2.value = true;
+                            toast.add({ severity: 'success', summary: 'Successfully', detail: `Update BTE successfully`, life: 3000 });
+                            setTimeout(function() {
+                                router.push('/my-spdk');
+                            }, 3000);
+                        } else {
+                            toast.add({ severity: 'warn', summary: 'Failed', detail: `Please try again`, life: 3000 });
+                        }
+                    }).catch(error => {
+                        toast.add({ severity: 'danger', summary: 'Attention', detail: `Please confirm to ICT Development.`, life: 3000 });
+                        console.error(error.response.status);
+                    })
+                } else {
+                    await User_PelaksanaService.postCreateBTE(id, form.value).then(res => {
+                        const load = res.data;
+                        console.log(load)
+                        if (load.success == true) {
+                            reset_form();
+                            loadingTable2.value = true;
+                            toast.add({ severity: 'success', summary: 'Successfully', detail: `Create BTE successfully`, life: 3000 });
+                            setTimeout(function() {
+                                router.push('/my-spdk');
+                            }, 3000);
+                        } else {
+                            toast.add({ severity: 'warn', summary: 'Failed', detail: `Please try again`, life: 3000 });
+                        }
+                    }).catch(error => {
+                        toast.add({ severity: 'danger', summary: 'Attention', detail: `Please confirm to ICT Development.`, life: 3000 });
+                        console.error(error.response.status);
+                    })
+                }
             } else {
-                toast.add({ severity: 'warn', summary: 'Failed', detail: `Please try again`, life: 3000 });
+                toast.add({ severity: 'warn', summary: 'Failed', detail: `Please complete the data`, life: 3000 });
             }
         } else {
             router.push('/my-spdk')
@@ -119,7 +177,7 @@
 </script>
 <template>
     <form class=" py-3">
-        <Toast/>
+        <Toast position="top-center"/>
         <div class="flex align-items-center justify-content-end md:justify-content-between mb-5 px-2">
             <div class="">
                 <i class="mr-4 text-2xl md:text-5xl pi pi-ticket"></i>
@@ -129,7 +187,11 @@
                 <strong class="text-500 font-light">SPDK <i class="pi pi-angle-double-right mx-2"></i> My SPDK <i class="pi pi-angle-double-right mx-2"></i> Form BTE</strong>
             </div>
         </div>
-        <div class="card shadow-4">
+        <div v-show="loadingTable2 == true" class="text-center">
+            <h3>Loading...</h3>
+            <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
+        </div>
+        <div class="card shadow-4"  v-show=" loadingTable2 == false">
             <div class="grid align-items-end">
                 <div class="col-12 md:col-3 sm:col-6 p-fluid">
                     <p class="text-lg font-semibold">DOLLAR EXCHANGE RATE</p>
@@ -180,7 +242,7 @@
                         <span class="p-inputgroup-addon">
                             <svg xmlns="http://www.w3.org/2000/svg" height="16" width="18" viewBox="0 0 576 512"><path d="M64 64C28.7 64 0 92.7 0 128v64c0 8.8 7.4 15.7 15.7 18.6C34.5 217.1 48 235 48 256s-13.5 38.9-32.3 45.4C7.4 304.3 0 311.2 0 320v64c0 35.3 28.7 64 64 64H512c35.3 0 64-28.7 64-64V320c0-8.8-7.4-15.7-15.7-18.6C541.5 294.9 528 277 528 256s13.5-38.9 32.3-45.4c8.3-2.9 15.7-9.8 15.7-18.6V128c0-35.3-28.7-64-64-64H64zm64 112l0 160c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16V176c0-8.8-7.2-16-16-16H144c-8.8 0-16 7.2-16 16zM96 160c0-17.7 14.3-32 32-32H448c17.7 0 32 14.3 32 32V352c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32V160z"/></svg>
                         </span>
-                        <InputNumber v-model="form.uang_tiket" :min="0" :disabled="dis_form.uang_tiket == 0 ? true : false" placeholder="Ticket Fee"/>
+                        <InputNumber v-model="form.uang_tiket" :min="0" placeholder="Ticket Fee"/>
                     </div>
                 </div>
                 <div class="col-12 md:col-3 p-fluid">

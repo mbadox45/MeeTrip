@@ -149,7 +149,18 @@ const router = createRouter({
                     meta:{
                         requiresAuth: true,
                         superadmin:true,
-                        adminsdm:true,
+                        // adminsdm:true,
+                        adminga:true,
+                    }
+                },
+                {
+                    path: '/disbursement-spdk',
+                    name: 'disbursement-spdk',
+                    component: () => import('@/views/meetrip/spdk/admin_ga/PencairanSpdk.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        superadmin:true,
+                        // adminsdm:true,
                         adminga:true,
                     }
                 },

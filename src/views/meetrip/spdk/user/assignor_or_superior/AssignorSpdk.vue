@@ -64,6 +64,7 @@
     };
     
     const aksi = async () => {
+        loadingTable2.value = true
         // loadingTable.value = 'Loading'
         try {
             const response = await User_SpdkApproveService.getPemberiTugas();
@@ -152,17 +153,14 @@
         if (ket == 'success_approve') {
             dialogs.value = false
             toast.add({ severity: 'success', summary: 'Successfully', detail: `Approved successfully`, life: 3000 });
-            loadingTable2.value = false;
             aksi();
         } else if (ket == 'success_revisi') {
             dialogs.value = false
             toast.add({ severity: 'success', summary: 'Successfully', detail: `Revision to user successfully`, life: 3000 });
-            loadingTable2.value = false;
             aksi();
         } else if (ket == 'success_cancel') {
             dialogs.value = false
             toast.add({ severity: 'success', summary: 'Successfully', detail: `Decline successfully`, life: 3000 });
-            loadingTable2.value = false;
             aksi();
         } else if (ket == 'danger') {
             dialogs.value = false

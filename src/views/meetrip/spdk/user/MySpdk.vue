@@ -13,7 +13,7 @@
 
     
     // Component
-    import {menu_300, menu_301, menu_302, menu_303, menu_0_or_12, menu_6, menu_7, menu_8} from '@/api/components/ListMenu.js';
+    import {menu_300, menu_301, menu_302, menu_303, menu_0_or_12, menu_1, menu_6, menu_7, menu_8} from '@/api/components/ListMenu.js';
     import SubmitDp from '@/views/meetrip/spdk/user/components/SubmitDp.vue';
     import DetailSpdk from '@/views/meetrip/spdk/user/components/DetailSpdk.vue';
     import CancelSpdk from '@/views/meetrip/spdk/user/components/CancelSpdk.vue';
@@ -97,7 +97,7 @@
                     submit_date: moment(data[i].created_at).format('DD MMMM YYYY'),
                     info: data[i].info,
                     destination: loc,
-                    status: data[i].status,
+                    status: Number(data[i].status),
                     nomor_surat: data[i].nomor_surat,
                     meta:data[i].meta,
                     note:data[i].note,
@@ -129,12 +129,14 @@
             menuModel.value = menu_302([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'cancel'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 303) {
             menuModel.value = menu_303([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'submit_dp'), () => detailData(selectedRequest.value, 'edit_dp'), () => detailData(selectedRequest.value, 'cancel'), () => detailData(selectedRequest.value, 'info'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
+        } else if (selectedRequest.value.status == 1) {
+            menuModel.value = menu_1([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'edit'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 6) {
             menuModel.value = menu_6([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'check_point'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 7) {
             menuModel.value = menu_7([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'isi_bte'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else if (selectedRequest.value.status == 8) {
-            menuModel.value = menu_8([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'isi_bte'), () => detailData(selectedRequest.value, 'submit_bte'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
+            menuModel.value = menu_8([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'edit_bte'), () => detailData(selectedRequest.value, 'submit_bte'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         } else {
             menuModel.value = menu_0_or_12([() => detailData(selectedRequest.value, 'detail'), () => detailData(selectedRequest.value, 'print'), () => detailData(selectedRequest.value, 'timeline')])
         }
@@ -158,6 +160,8 @@
             router.push('/dp-bto');
         } else if (status === 'isi_bte') {
             router.push(`/bte/${data.id}`);
+        } else if (status === 'edit_bte') {
+            router.push(`/bte/${data.id}?type=edit`);
         } else if (status === 'edit_dp') {
             router.push(`/dp-bto/${data.id}?status=edit`);
         } else if (status === 'submit_dp') {

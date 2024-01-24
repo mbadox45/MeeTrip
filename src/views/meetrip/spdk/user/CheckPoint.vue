@@ -4,6 +4,7 @@
     import { useToast } from 'primevue/usetoast';
     import moment from 'moment';
     import axios from 'axios';
+    import { Loader } from '@googlemaps/js-api-loader';
 
     // API
     import User_PelaksanaService from '@/api/user/PelaksanaService';
@@ -19,10 +20,13 @@
     const route = useRoute();
     const toast = useToast();
     const { coords } = useGeolocation();
-
+    const loaders = new Loader({ apiKey: GOOGLE_MAPS_API_KEYS });
+    
     const id = route.params.id
     const loads = ref({id:id, name:null, nomor:null, jabatan: null, tgl_berangkat:null, tgl_kembali:null, pemberitugas:null, destinations:null})
     const destination = ref([])
+    const mapDiv = ref(null);
+    // let map = ref(null);
 
     const load_data = async () => {
         const response = await User_SpdkFormService.getDetailMySPDK(id);
@@ -55,37 +59,98 @@
                     ],
                     name: place.name,
                     attend: data[i].attend,
+                    distance: numberWithThousandSeparator(parseFloat(Number(await calculateHaversineDistance(get_placenow.geometry.location.lat, get_placenow.geometry.location.lng, get_placeid.geometry.location.lat, get_placeid.geometry.location.lng)).toFixed(2)))
                 }
             }
             destination.value = list
-            console.log(destination.value)
+            // console.log(list)
         } else {
             destination.value = []
         }
     }
 
+    const numberWithThousandSeparator = (number) => {
+        return number.toLocaleString('en-US');
+    };
+
+    const addMarker = async (position) => {
+        // Create marker
+        let map = new google.maps.Map(mapDiv.value, {
+            center: {lat: 0, lng:117.200642},
+            zoom: 5,
+        });
+        const marker = new google.maps.Marker({
+            position: position,
+            map: map,
+        });
+        return marker
+    }
+
+    const calculateDistance = async (latLng1, latLng2) => {
+        return google.maps.geometry.spherical.computeDistanceBetween(latLng1, latLng2);
+    };
+
     onMounted(() => {
         load_data()
     });
 
+    const toRadians = (degrees) => {
+        return degrees * (Math.PI / 180);
+    }
+
+    const calculateHaversineDistance = async (lat1, lon1, lat2, lon2) => {
+        // Radius of the Earth in kilometers
+        const R = 6371000;
+
+        // Convert latitude and longitude from degrees to radians
+        const lat1Rad = toRadians(lat1);
+        const lon1Rad = toRadians(lon1);
+        const lat2Rad = toRadians(lat2);
+        const lon2Rad = toRadians(lon2);
+
+        // Calculate differences
+        const dLat = lat2Rad - lat1Rad;
+        const dLon = lon2Rad - lon1Rad;
+
+        // Haversine formula
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        // Distance in kilometers
+        const distance = R * c;
+
+        return distance;
+    }
+
     const postData = async (id_dest, data_dest) => {
         console.log(id_dest, data_dest)
-        // data_dest = {
-        //     current_latitude : 3.1319965,
-        //     current_longitude : 99.3425704
-        // }
-        try {
-            const response = await User_PelaksanaService.putAttendSPDK(id_dest, data_dest);
-            const data = response.data;
-            console.log(response)
-            if (data.success == true) {
-                toast.add({ severity: 'success', summary: 'Successfully', detail: `Check point successfully`, life: 3000 });
-                load_data()
-            } else {
-                toast.add({ severity: 'warn', summary: 'Warning', detail: `You are out of reach of your destination location`, life: 3000 });
+        const get_placenow = await getLocationName(coords.value.latitude, coords.value.longitude)
+        const distance = await calculateHaversineDistance(get_placenow.geometry.location.lat, get_placenow.geometry.location.lng, data_dest.current_latitude, data_dest.current_longitude)
+        // console.log(distance)
+        if (distance <= 500 ) {
+            const post = {
+                current_latitude : get_placenow.geometry.location.lat,
+                current_longitude : get_placenow.geometry.location.lng
             }
-        } catch (error) {
-            toast.add({ severity: 'danger', summary: 'Attention', detail: `Cannot attend when the distance is greater than 100 meters.`, life: 3000 });
+            try {
+                const response = await User_PelaksanaService.putAttendSPDK(id_dest, post);
+                const data = response.data;
+                console.log(response)
+                if (data.success == true) {
+                    toast.add({ severity: 'success', summary: 'Successfully', detail: `Check point successfully`, life: 3000 });
+                    load_data()
+                } else {
+                    toast.add({ severity: 'warn', summary: 'Warning', detail: `You are out of reach of your destination location : `, life: 3000 });
+                }
+            } catch (error) {
+                toast.add({ severity: 'danger', summary: 'Attention', detail: `Cannot attend when the distance is greater than 100 meters.`, life: 3000 });
+            }
+            // toast.add({ severity: 'success', summary: 'Successfully', detail: `Check point successfully`, life: 3000 });
+        } else {
+            toast.add({ severity: 'warn', summary: 'Warning', detail: `You are out of reach of your destination location`, life: 3000 });
         }
     }
 </script>
@@ -150,7 +215,9 @@
         </Divider>
         <Panel toggleable v-show="destination.length > 0" v-for="(lokasi, index) in destination" :key="index">
             <template #header>
-                <strong class="font-semibold text-gray-500"><i class="pi pi-map-marker mr-2 text-pink-500 font-bold"></i> {{ lokasi.name.toUpperCase() }} <small v-show="lokasi.attend == true" class="ml-3 text-green-500">Done</small></strong>
+                <div v-tooltip.bottom="{value:`Distance : ${lokasi.distance} m`}">
+                    <strong class="font-semibold text-gray-500"><i class="pi pi-map-marker mr-2 text-pink-500 font-bold"></i> {{ lokasi.name.toUpperCase() }} <span :class="`mx-2 ${lokasi.distance > 500 ? 'text-red-500' : 'text-green-500'}`">{{ lokasi.distance > 500 ? 'You are out of reach of the destination point' : 'You are within range of the destination point'}}</span> <small v-show="lokasi.attend == true" class="ml-3 text-green-500">Done</small></strong>
+                </div>
             </template>
             <div class="flex align-items-center">
                 <div class="w-full">
@@ -162,7 +229,7 @@
                     </p>
                 </div>
                 <div class="w-full text-left md:text-right">
-                    <Button v-if="lokasi.attend == false" label="Check Point" icon="pi pi-compass" class="mb-2" @click="postData(lokasi.location[1].id,{current_latitude: lokasi.location[1].latitude, current_longitude: lokasi.location[1].longitude})"/>
+                    <Button v-if="lokasi.attend == false" label="Check Point" icon="pi pi-compass" :disabled="lokasi.distance > 500 ? true : false" class="mb-2" @click="postData(lokasi.location[0].id,{current_latitude: lokasi.location[0].latitude, current_longitude: lokasi.location[0].longitude})"/>
                     <span v-else class="text-green-500"><i class="pi pi-check mx-2 font-bold"></i>Check Point is <strong>Done</strong></span>
                 </div>
             </div>

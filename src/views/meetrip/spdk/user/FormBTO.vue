@@ -11,6 +11,7 @@
     // API
     import UserService from '@/api/UserService'
     import User_SpdkFormService from '@/api/user/SpdkFormService'
+    import Admin_SpdkAdminService from '@/api/admin/SpdkAdminService'
     import { getDescLoc, getLocationName } from '@/api/gmaps/MapsService'
     import { kendaraan, down_payment } from '@/api/Databodong';
     import { GOOGLE_MAPS_API_KEYS, URL_MAPS_API, URL_API } from '@/api/env';
@@ -54,6 +55,9 @@
     const load_spdk = async() => {
         const response = await User_SpdkFormService.getDetailMySPDK(formID);
         const load = response.data.data;
+        location.value = [
+            {locate:null, list_location:[], placeholder:'Start Location'}, 
+        ]
         form.value = {
             id: formID,
             atasan_id: load.atasan_id,
@@ -66,9 +70,9 @@
             kendaraan: load.kendaraan,
             rombongan: load.rombongan,
             uang_panjar: load.uang_panjar,
-            lampiran: `${URL_API}${load.lampiran}`,
+            lampiran: `${URL_API}${load.lampiran.substring(1)}`,
         }
-        
+        console.log(load)
         // Get Location
         const get_placestart = await getLocationName(load.destinations[0].start_latitude, load.destinations[0].start_longitude);
         const placestart = await getDescLoc(get_placestart.place_id)
@@ -88,17 +92,26 @@
         for (let i = 0; i < dest.length; i++) {
             const get_placestart = await getLocationName(dest[i].latitude, dest[i].longitude);
             const placestart = await getDescLoc(get_placestart.place_id)
-            location.value[i+1].list_location[0]= {
-                description: get_placestart.formatted_address,
-                place_id: get_placestart.place_id,
-                main_text: placestart.name,
-            }
-            location.value[i+1].locate= {
-                description: get_placestart.formatted_address,
-                place_id: get_placestart.place_id,
-                main_text: placestart.name,
-            }
-            location.value[i+1].placeholder = 'Start Location'
+            location.value.push({
+                list_location:[{ description: get_placestart.formatted_address, place_id: get_placestart.place_id, main_text: placestart.name}], 
+                locate: {
+                    description: get_placestart.formatted_address,
+                    place_id: get_placestart.place_id,
+                    main_text: placestart.name,
+                }, 
+                placeholder:'Destination Location'
+            })
+            // location.value[i+1].list_location[0]= {
+            //     description: get_placestart.formatted_address,
+            //     place_id: get_placestart.place_id,
+            //     main_text: placestart.name,
+            // }
+            // location.value[i+1].locate= {
+            //     description: get_placestart.formatted_address,
+            //     place_id: get_placestart.place_id,
+            //     main_text: placestart.name,
+            // }
+            // location.value[i+1].placeholder = 'Destination Location'
         }
     }
     
@@ -278,7 +291,6 @@
     // Post Data to BE_API
     const postData = async () => {
         const loc = location.value;
-        let fileInput = document.getElementById('lampiran_ID'); 
         if (loc[0].locate != null && form.value.atasan_id != null && form.value.keperluan != '' && form.value.tgl_berangkat != '' && form.value.tgl_kembali != '' && form.value.jam_pergi != '' && form.value.jam_sampai != '' && form.value.barang != null && form.value.kendaraan != null && form.value.uang_panjar != null) {
             // Form Data with Append
             let formData = new FormData();
@@ -306,11 +318,40 @@
             }
             form.value.lama_hari = perhitungan_waktu(form.value.tgl_berangkat, form.value.jam_pergi, form.value.tgl_kembali, form.value.jam_sampai)+1
             formData.append('lama_hari', form.value.lama_hari);
-
+            
+            let fileInput = document.getElementById('lampiran_ID'); 
             // Execute API
-            if (fileInput.files.length > 0) {
-                formData.append('lampiran', document.getElementById('lampiran_ID').files[0]);
-                if (formID != null) {
+
+            if (formID != null) {
+                if (fileInput.files.length > 0) {
+                    formData.append('lampiran', document.getElementById('lampiran_ID').files[0]);
+                    console.log(document.getElementById('lampiran_ID').files[0])
+                } else {
+                    const res = await fetch(form.value.lampiran);
+                    const imageBlob = await res.blob();
+                    const fileName = form.value.lampiran.split('/').pop();
+                    formData.append('lampiran', imageBlob, fileName);
+                    console.log('lampiran', imageBlob, fileName)
+                }
+                // console.log(formData)
+                if (roles.value == 'adminga') {
+                    await Admin_SpdkAdminService.putUpdateSPDK(formID,formData).then(res => {
+                            const load = res.data;
+                            if (load.success == true) {
+                                reset_form();
+                                messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
+                                loading.value = true;
+                                setTimeout(function() {
+                                    router.push('/my-spdk');
+                                }, 3000);
+                            } else {
+                                messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
+                            }
+                        }).catch(error => {
+                            messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
+                            console.error(error.response.status);
+                        })
+                } else {
                     await User_SpdkFormService.putUpdateMySPDK(formID,formData).then(res => {
                         const load = res.data;
                         if (load.success == true) {
@@ -327,71 +368,26 @@
                         messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
                         console.error(error.response.status);
                     })
-                } else {
-                    await User_SpdkFormService.postAddMySPDK(formData).then(res => {
-                        const load = res.data;
-                        console.log(load)
-                        if (load.success == true) {
-                            reset_form();
-                            messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
-                            loading.value = true;
-                            setTimeout(function() {
-                                router.push('/my-spdk');
-                            }, 3000);
-                        } else {
-                            messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
-                        }
-                    }).catch(error => {
-                        messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
-                        console.error(error.response.status);
-                    })
                 }
             } else {
-                if (form.value.lampiran != null) {
-                    const res = await fetch(form.value.lampiran);
-                    const imageBlob = await res.blob();
-                    const fileName = form.value.lampiran.split('/').pop();
-                    formData.append('lampiran', imageBlob, fileName);
-                    if (formID != null) {
-                        await User_SpdkFormService.putUpdateMySPDK(formID,formData).then(res => {
-                            const load = res.data;
-                            if (load.success == true) {
-                                reset_form();
-                                messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
-                                loading.value = true;
-                                setTimeout(function() {
-                                    router.push('/my-spdk');
-                                }, 3000);
-                            } else {
-                                messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
-                            }
-                        }).catch(error => {
-                            messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
-                            console.error(error.response.status);
-                        })
+                formData.append('lampiran', document.getElementById('lampiran_ID').files[0]);
+                await User_SpdkFormService.postAddMySPDK(formData).then(res => {
+                    const load = res.data;
+                    console.log(load)
+                    if (load.success == true) {
+                        reset_form();
+                        messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
+                        loading.value = true;
+                        setTimeout(function() {
+                            router.push('/my-spdk');
+                        }, 3000);
                     } else {
-                        await User_SpdkFormService.postAddMySPDK(formData).then(res => {
-                            const load = res.data;
-                            if (load.success == true) {
-                                reset_form();
-                                messagess.value = [{ severity: 'success', content: 'Save BTO successfully', id: count.value++ },];
-                                loading.value = true;
-                                setTimeout(function() {
-                                    router.push('/my-spdk');
-                                }, 3000);
-                            } else {
-                                messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
-                            }
-                        }).catch(error => {
-                            messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
-                            console.error(error.response.status);
-                        })
+                        messagess.value = [{ severity: 'warn', content: 'Please refresh this page and re-enter the data.', id: count.value++ },];
                     }
-                } else {
-                    messagess.value = [
-                        { severity: 'warn', content: 'Please complete the data', id: count.value++ },
-                    ];
-                }
+                }).catch(error => {
+                    messagess.value = [{ severity: 'error', content: 'Please confirm to ICT Development.', id: count.value++ },];
+                    console.error(error.response.status);
+                })
             }
         } else {
             messages.value = false

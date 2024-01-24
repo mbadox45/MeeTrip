@@ -82,6 +82,18 @@ export const menu_0_or_12 = (func) => {
     return list;
 }
 
+export const menu_1 = (func) => { //di update
+    const list = [
+        {label: 'Detail SPDK', icon: 'pi pi-fw pi-search', command: () => func[0]()},
+        {label: 'Edit BTO', icon: 'pi pi-fw pi-pencil', command: () => func[1]()},
+        {separator:true},
+        {label: 'Print', icon: 'pi pi-fw pi-print', command: () => func[2]()},
+        {label: 'Timeline', icon: 'pi pi-fw pi-list', command: () => func[3]()},
+    ]
+
+    return list;
+}
+
 export const menu_all_spdk = (func) => { //di update
     const list = [
         {label: 'Detail SPDK', icon: 'pi pi-fw pi-search', command: () => func[0]()},
@@ -92,7 +104,6 @@ export const menu_all_spdk = (func) => { //di update
     ]
 
     return list;
-
 }
 
 export const menu_2 = (func) => {
