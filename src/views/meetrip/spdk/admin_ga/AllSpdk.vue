@@ -2,8 +2,9 @@
     import { onMounted, ref } from 'vue';
     import { useRouter, useRoute } from 'vue-router';
     import { FilterMatchMode } from 'primevue/api';
-    import moment from 'moment';
     import { useToast } from 'primevue/usetoast';
+    import * as XLSX from 'xlsx';
+    import moment from 'moment';
     import axios from 'axios';
 
     // API
@@ -34,6 +35,7 @@
     const routes = ref(route.path)
     const loadingTable2 = ref(false);
     const request_data = ref([])
+    const export_data = ref([])
     const menuModel = ref([]);
     const cm = ref();
     const selectedRequest = ref({status:null, id:null});
@@ -42,6 +44,11 @@
     const menu = ref();
     const search = ref({global: { value: null, matchMode: FilterMatchMode.CONTAINS }});
     const GOOGLE_MAPS_API_KEY = GOOGLE_MAPS_API_KEYS;
+    const test_data = ref([
+        { id: 1, name: 'John Doe', email: 'john@example.com' },
+        { id: 2, name: 'Jane Doe', email: 'jane@example.com' },
+        // Add more data as needed
+    ]);
     const items = ref([
         {
             label: 'Options',
@@ -73,6 +80,14 @@
         menu.value.toggle(event);
     };
 
+    const exportData = () => {
+        const data =  export_data.value;
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Report SPDK');
+        XLSX.writeFile(wb, `Laporan SPDK ${moment().format('YYYY-MM-DD HHmmss')}.xlsx`);
+    };
+
     const getLocationName = async (latitude, longitude) => {
         try {
             const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
@@ -95,21 +110,26 @@
             const response = await Admin_SpdkAdminService.getSPDK();
             const data = response.data.data;
             const list = [];
+            const list2 = [];
             console.log(data)
             for (let i = 0; i < data.length; i++) {
                 let loc='';
+                let loc2='';
                 if (data[i].destinations.length > 0) {
                     if (data[i].destinations.length > 1) {
                         const destination = data[i].destinations
                         loc += '<ol>'
                         for (let a = 0; a < destination.length; a++) {
                             loc += `<li>${await getLocationName(destination[a].latitude, destination[a].longitude)}</li>`
+                            loc2 += `${a+1}. ${await getLocationName(destination[a].latitude, destination[a].longitude)} `
                         }
                         loc += '</ol>'
                     } else {
+                        loc2 = await getLocationName(data[i].destinations[0].latitude, data[i].destinations[0].longitude);
                         loc = `<span>${await getLocationName(data[i].destinations[0].latitude, data[i].destinations[0].longitude)}</span>`;
                     }
                 } else {
+                    loc2 = data[i].tujuan;
                     loc = `<span>${data[i].tujuan}</span>`;
                 }
                 const colors = bg_color.find(item => item.status === data[i].status);
@@ -130,9 +150,25 @@
                     color: colors,
                     created_at:moment(data[i].created_at).format('DD MMMM YYYY - HH:mm:ss'),
                 };
+                list2[i] = {
+                    // ID: data[i].id,
+                    NomorSurat: data[i].nomor_surat,
+                    Info: data[i].info,
+                    Destination: loc2,
+                    Jabatan: data[i].jabatan,
+                    Kendaraan:data[i].kendaraan,
+                    TotalAkomodasi:data[i].total,
+                    Berangkat:`${data[i].tgl_berangkat} ${data[i].jam_pergi}`,
+                    Kembali:`${data[i].tgl_kembali} ${data[i].jam_sampai}`,
+                    User: data[i].user ? data[i].user.name : null,
+                    PemberiTugas: data[i].pemberi_tugas,
+                    TglSubmit:moment(data[i].created_at).format('YYYY-MM-DD'),
+                    Keperluan:data[i].keperluan,
+                };
             }
             loadingTable2.value = false
             request_data.value = list;
+            export_data.value = list2;
         } catch (error) {
             loadingTable2.value = false;
             request_data.value = []
@@ -252,7 +288,7 @@
             <div class="card border-round-md">
                 <div class="flex justify-content-between align-items-center">
                     <div class="w-full">
-                        <i class="pi pi-download text-2xl font-bold hover:text-pink-500 cursor-pointer" v-tooltip.bottom="`Export to Excel`"></i>
+                        <i class="pi pi-download text-2xl font-bold hover:text-pink-500 cursor-pointer" v-tooltip.bottom="`Export to Excel`" @click="exportData"></i>
                     </div>
                     <div class="p-fluid w-full">
                         <span class="p-input-icon-left">

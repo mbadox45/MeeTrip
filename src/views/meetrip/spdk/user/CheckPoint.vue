@@ -59,7 +59,8 @@
                     ],
                     name: place.name,
                     attend: data[i].attend,
-                    distance: numberWithThousandSeparator(parseFloat(Number(await calculateHaversineDistance(get_placenow.geometry.location.lat, get_placenow.geometry.location.lng, get_placeid.geometry.location.lat, get_placeid.geometry.location.lng)).toFixed(2)))
+                    distance: numberWithThousandSeparator(parseFloat(Number(await calculateHaversineDistance(get_placenow.geometry.location.lat, get_placenow.geometry.location.lng, get_placeid.geometry.location.lat, get_placeid.geometry.location.lng)).toFixed(2))),
+                    distances: parseFloat(Number(await calculateHaversineDistance(get_placenow.geometry.location.lat, get_placenow.geometry.location.lng, get_placeid.geometry.location.lat, get_placeid.geometry.location.lng)).toFixed(2))
                 }
             }
             destination.value = list
@@ -148,7 +149,7 @@
             } catch (error) {
                 toast.add({ severity: 'danger', summary: 'Attention', detail: `Cannot attend when the distance is greater than 100 meters.`, life: 3000 });
             }
-            // toast.add({ severity: 'success', summary: 'Successfully', detail: `Check point successfully`, life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfully', detail: `Check point successfully`, life: 3000 });
         } else {
             toast.add({ severity: 'warn', summary: 'Warning', detail: `You are out of reach of your destination location`, life: 3000 });
         }
@@ -216,7 +217,7 @@
         <Panel toggleable v-show="destination.length > 0" v-for="(lokasi, index) in destination" :key="index">
             <template #header>
                 <div v-tooltip.bottom="{value:`Distance : ${lokasi.distance} m`}">
-                    <strong class="font-semibold text-gray-500"><i class="pi pi-map-marker mr-2 text-pink-500 font-bold"></i> {{ lokasi.name.toUpperCase() }} <span :class="`mx-2 ${lokasi.distance > 500 ? 'text-red-500' : 'text-green-500'}`">{{ lokasi.distance > 500 ? 'You are out of reach of the destination point' : 'You are within range of the destination point'}}</span> <small v-show="lokasi.attend == true" class="ml-3 text-green-500">Done</small></strong>
+                    <strong class="font-semibold text-gray-500"><i class="pi pi-map-marker mr-2 text-pink-500 font-bold"></i> {{ lokasi.name.toUpperCase() }} <span :class="`mx-2 ${lokasi.distances > 500 ? 'text-red-500' : 'text-green-500'}`">{{ lokasi.distances > 500 ? 'You are out of reach of the destination point' : 'You are within range of the destination point'}}</span> <small v-show="lokasi.attend == true" class="ml-3 text-green-500">Done</small></strong>
                 </div>
             </template>
             <div class="flex align-items-center">

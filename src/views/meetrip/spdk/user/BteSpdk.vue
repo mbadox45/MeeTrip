@@ -115,7 +115,7 @@
         }
     }
 
-    const postData = async (ket) => {
+    const postData = (ket) => {
         if (ket == 'save') {
             if ( form.value.sarapan != null && form.value.makan_siang != null && form.value.makan_malam != null && form.value.airport != null && form.value.uang_saku != null && form.value.uang_hotel != null && form.value.uang_laundry != null && form.value.uang_transport_dilokasi != null && form.value.uang_tiket != null && form.value.uang_pp != null) {
                 const test = lain_lain.value;
@@ -132,11 +132,11 @@
     
                 const id = route.params.id;
                 if (formID != null) {
-                    await User_PelaksanaService.putUpdateBTE(id, form.value).then(res => {
+                    User_PelaksanaService.putUpdateBTE(id, form.value).then(res => {
                         const load = res.data;
+                        console.log(load)
                         if (load.success == true) {
                             reset_form();
-                            loadingTable2.value = true;
                             toast.add({ severity: 'success', summary: 'Successfully', detail: `Update BTE successfully`, life: 3000 });
                             setTimeout(function() {
                                 router.push('/my-spdk');
@@ -149,12 +149,11 @@
                         console.error(error.response.status);
                     })
                 } else {
-                    await User_PelaksanaService.postCreateBTE(id, form.value).then(res => {
+                    User_PelaksanaService.postCreateBTE(id, form.value).then(res => {
                         const load = res.data;
                         console.log(load)
                         if (load.success == true) {
                             reset_form();
-                            loadingTable2.value = true;
                             toast.add({ severity: 'success', summary: 'Successfully', detail: `Create BTE successfully`, life: 3000 });
                             setTimeout(function() {
                                 router.push('/my-spdk');
@@ -177,7 +176,7 @@
 </script>
 <template>
     <form class=" py-3">
-        <Toast position="top-center"/>
+        <Toast/>
         <div class="flex align-items-center justify-content-end md:justify-content-between mb-5 px-2">
             <div class="">
                 <i class="mr-4 text-2xl md:text-5xl pi pi-ticket"></i>
