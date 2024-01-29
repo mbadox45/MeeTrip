@@ -14,6 +14,8 @@
     const payload = ref(JSON.parse(localStorage.getItem('payload')));
     const wilayah = ref(["dalam wilayah", "luar wilayah", "luar negeri"])
     const uangNegara = ref(null);
+    const form_date = ref({tgl_berangkat:null, jam_pergi:null, tgl_kembali:null, jam_sampai:null});
+    const tgl_back = ref(null)
     const dataSPDK = ref(null);
     const dis_form = ref({sarapan:null, makan_malam:null, makan_siang:null, airport:null, uang_saku:null, uang_hotel:null, uang_laundry:null, uang_transport_dilokasi:null, uang_tiket:null, uang_pp:null, uang_komunikasi:null, lain:[], nilai_lain:[]})
     const form = ref({id:null, kurs_usd:0, sarapan:null, makan_siang:null, makan_malam:null, airport:null, uang_saku:null, uang_hotel:null, uang_laundry:null, uang_transport_dilokasi:null, uang_tiket:null, uang_pp:null, uang_komunikasi:null, lain:[], nilai_lain:[]})
@@ -40,28 +42,17 @@
         dataSPDK.value = spdk;
         console.log(spdk)
 
-        // Load Uang
-        const response = await Misc_PaguService.getAllUang()
-        const data = response.data.data;
+        // Date
+        form_date.value = {
+            tgl_berangkat: spdk.tgl_berangkat,
+            jam_pergi: spdk.jam_pergi,
+            tgl_kembali: spdk.tgl_kembali,
+            jam_sampai: spdk.jam_sampai,
+        }
+        tgl_back.value = spdk.tgl_kembali
 
-        // Filter By Wilayah + Jabatan
-        const region =  wilayah.value[Number(spdk.wilayah)-1]
-        const filteredData = data.filter(item => item.wilayah === region && item.jabatan === spdk.golongan);
-        console.log(filteredData[0])
-        
-        dis_form.value = {
-            sarapan: calculateConsumtionMax(spdk, filteredData[0].pagi, 'pagi'),
-            makan_malam: calculateConsumtionMax(spdk, filteredData[0].malam, 'malam'),
-            makan_siang: calculateConsumtionMax(spdk, filteredData[0].siang, 'siang'),
-            uang_saku: localTransport(spdk, filteredData[0].saku),
-            airport: Number(filteredData[0].airport),
-            uang_transport_dilokasi: localTransport(spdk, filteredData[0].transport_lokal),
-            uang_hotel: hotelCalculate(spdk, filteredData[0].hotel),
-            uang_laundry: hotelCalculate(spdk, filteredData[0].laundry),
-            uang_komunikasi: localTransport(spdk, filteredData[0].komunikasi),
-            uang_tiket: filteredData[0].tiket,
-        };
-        console.log(dis_form.value);
+        nilai_max_calulate()
+
         
         // Get Kurs
         await kursUSD(Number(spdk.wilayah));
@@ -70,6 +61,34 @@
             await load_edit(spdk)
         }
         loadingTable2.value = false
+    }
+
+    const nilai_max_calulate = async() => {
+
+        console.log(form_date.value)
+
+        // Load Uang
+        const response = await Misc_PaguService.getAllUang()
+        const data = response.data.data;
+
+        // Filter By Wilayah + Jabatan
+        const region =  wilayah.value[Number(dataSPDK.value.wilayah)-1]
+        const filteredData = data.filter(item => item.wilayah === region && item.jabatan === dataSPDK.value.golongan);
+        console.log(filteredData[0])
+        
+        dis_form.value = {
+            sarapan: calculateConsumtionMax(form_date.value, filteredData[0].pagi, 'pagi'),
+            makan_malam: calculateConsumtionMax(form_date.value, filteredData[0].malam, 'malam'),
+            makan_siang: calculateConsumtionMax(form_date.value, filteredData[0].siang, 'siang'),
+            uang_saku: localTransport(form_date.value, filteredData[0].saku),
+            airport: Number(filteredData[0].airport),
+            uang_transport_dilokasi: localTransport(form_date.value, filteredData[0].transport_lokal),
+            uang_hotel: hotelCalculate(form_date.value, filteredData[0].hotel),
+            uang_laundry: hotelCalculate(form_date.value, filteredData[0].laundry),
+            uang_komunikasi: localTransport(form_date.value, filteredData[0].komunikasi),
+            uang_tiket: filteredData[0].tiket,
+        };
+        console.log(dis_form.value);
     }
 
     const load_edit = async (data) => {
@@ -192,6 +211,40 @@
         </div>
         <div class="card shadow-4"  v-show=" loadingTable2 == false">
             <div class="grid align-items-end">
+                <div class="col-12 md:col-3 sm:col-6 p-fluid">
+                    <p class="text-lg font-semibold">DEPARTURE</p>
+                    <div class="p-inputgroup">
+                        <span class="p-inputgroup-addon">
+                            <i class="pi pi-calendar"></i>
+                        </span>
+                        <InputText type="date" v-model="form_date.tgl_berangkat" inputId="integeronly" disabled/>
+                    </div>
+                </div>
+                <div class="col-12 md:col-3 sm:col-6 p-fluid">
+                    <div class="p-inputgroup">
+                        <span class="p-inputgroup-addon">
+                            <i class="pi pi-clock"></i>
+                        </span>
+                        <InputText type="time" v-model="form_date.jam_pergi" inputId="integeronly" disabled/>
+                    </div>
+                </div>
+                <div class="col-12 md:col-3 sm:col-6 p-fluid">
+                    <p class="text-lg font-semibold">ARRIVAL</p>
+                    <div class="p-inputgroup">
+                        <span class="p-inputgroup-addon">
+                            <i class="pi pi-calendar"></i>
+                        </span>
+                        <InputText type="date" v-model="form_date.tgl_kembali" inputId="integeronly" :min="moment(tgl_back).format('YYYY-MM-DD')" @change="nilai_max_calulate"/>
+                    </div>
+                </div>
+                <div class="col-12 md:col-3 sm:col-6 p-fluid">
+                    <div class="p-inputgroup">
+                        <span class="p-inputgroup-addon">
+                            <i class="pi pi-clock"></i>
+                        </span>
+                        <InputText type="time" v-model="form_date.jam_sampai" inputId="integeronly" @change="nilai_max_calulate"/>
+                    </div>
+                </div>
                 <div class="col-12 md:col-3 sm:col-6 p-fluid">
                     <p class="text-lg font-semibold">DOLLAR EXCHANGE RATE</p>
                     <div class="p-inputgroup">

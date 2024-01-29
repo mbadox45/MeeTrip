@@ -47,10 +47,22 @@ export const down_payment = [
     { name: 'No Need', uang_panjar: 0, icon:`<i class="pi pi-times-circle text-red-500 mr-2"></i>` },
 ];
 
+const perhitungan_waktu = (t_berangkat, j_berangkat, t_sampai, j_sampai) => {
+    // Assuming t_berangkat, j_berangkat, t_sampai, and j_sampai are strings
+    const w_berangkat = moment(`${t_berangkat} ${j_berangkat}`);
+    const w_sampai = moment(`${t_sampai} ${j_sampai}`);
+
+    // Calculate the difference in days
+    const durationInDays = w_sampai.diff(w_berangkat, 'days');
+
+    return durationInDays;
+};
+
 export const calculateConsumtionMax = (spdk, uangs, jenis) => {
-    const jumlah_hari = spdk.lama_hari;
     const jam_pergi = moment(`${spdk.tgl_berangkat} ${spdk.jam_pergi}`).unix();
     const jam_kembali = moment(`${spdk.tgl_kembali} ${spdk.jam_sampai}`).unix();
+    const jumlah_hari = perhitungan_waktu(spdk.tgl_berangkat, spdk.jam_pergi, spdk.tgl_kembali, spdk.jam_sampai);
+    // console.log(jumlah_hari)
     let JumPagu = 0;
     if (jumlah_hari > 1) {
         if (jenis == 'pagi') {
@@ -111,18 +123,75 @@ export const calculateConsumtionMax = (spdk, uangs, jenis) => {
                 // console.log('Dapat Makan Malam', '>> Dinas > 1 Hari, Kembali');
             }
             JumPagu = PaguBerangkat + PaguKembali + ((jumlah_hari - 2) * uangs)
-            // console.log(PaguBerangkat)
-            // console.log(PaguKembali)
-            // console.log(((jumlah_hari - 2) * uangs))
+        }
+    } else {
+        if (jenis == 'pagi') {
+            let PaguBerangkat = 0;
+            if (jam_pergi >= moment(`${spdk.tgl_berangkat} 00:00:00`).unix() && jam_pergi <= moment(`${spdk.tgl_berangkat} 08:01:00`).unix()) {
+                // console.log('Dapat Sarapan', '>> Dinas > 1 Hari, Berangkat');
+                PaguBerangkat = uangs;
+            } else {
+                // console.log('Tidak Dapat Sarapan', '>> Dinas > 1 Hari, Berangkat');
+                PaguBerangkat = 0;
+            }
+
+            let PaguKembali = 0;
+            if (jam_kembali < moment(`${spdk.tgl_kembali} 06:00:00`).unix()) {
+                // console.log('Tidak Dapat Sarapan', '>> Dinas > 1 Hari, Kembali');
+                PaguKembali = 0;
+            } else {
+                PaguKembali = uangs;
+                // console.log('Dapat Sarapan', '>> Dinas > 1 Hari, Kembali');
+            }
+            JumPagu = PaguBerangkat + PaguKembali + ((jumlah_hari - 1) * uangs)
+        } else if (jenis == 'siang') {
+            let PaguBerangkat = 0;
+            if (jam_pergi >= moment(`${spdk.tgl_berangkat} 00:00:00`).unix() && jam_pergi <= moment(`${spdk.tgl_berangkat} 13:01:00`).unix()) {
+                // console.log('Dapat Makan Siang', '>> Dinas > 1 Hari, Berangkat');
+                PaguBerangkat = uangs;
+            } else {
+                // console.log('Tidak Dapat Makan Siang', '>> Dinas > 1 Hari, Berangkat');
+                PaguBerangkat = 0;
+            }
+
+            let PaguKembali = 0;
+            if (jam_kembali < moment(`${spdk.tgl_kembali} 12:00:00`).unix()) {
+                // console.log('Tidak Dapat Makan Siang', '>> Dinas > 1 Hari, Kembali');
+                PaguKembali = 0;
+            } else {
+                // console.log('Dapat Makan Siang', '>> Dinas > 1 Hari, Kembali');
+                PaguKembali = uangs;
+            }
+            JumPagu = PaguBerangkat + PaguKembali + ((jumlah_hari - 1) * uangs)
+        } else {
+            let PaguBerangkat = 0;
+            if (jam_pergi >= moment(`${spdk.tgl_berangkat} 00:00:00`).unix() && jam_pergi <= moment(`${spdk.tgl_berangkat} 20:01:00`).unix()) {
+                // console.log('Dapat Makan Malam', '>> Dinas > 1 Hari, Berangkat');
+                PaguBerangkat = uangs;
+            } else {
+                // console.log('Tidak Dapat Makan Malam', '>> Dinas > 1 Hari, Berangkat');
+                PaguBerangkat = 0;
+            }
+
+            let PaguKembali = 0;
+            if (jam_kembali < moment(`${spdk.tgl_kembali} 18:00:00`).unix()) {
+                // console.log('Tidak Dapat Makan Malam', '>> Dinas > 1 Hari, Kembali');
+                // 23:59:59
+                PaguKembali = 0;
+            } else {
+                PaguKembali = uangs;
+                // console.log('Dapat Makan Malam', '>> Dinas > 1 Hari, Kembali');
+            }
+            JumPagu = PaguBerangkat + PaguKembali + ((jumlah_hari - 1) * uangs)
         }
     }
-    // console.log(JumPagu)
 
     return JumPagu;
 }
 
 export const localTransport = (spdk, uangs) => {
-    const jumlah_hari = spdk.lama_hari;
+    // const jumlah_hari = spdk.lama_hari;
+    const jumlah_hari = perhitungan_waktu(spdk.tgl_berangkat, spdk.jam_pergi, spdk.tgl_kembali, spdk.jam_sampai);
 
     // Variable Sarapan
     const pagu = uangs;
@@ -132,11 +201,17 @@ export const localTransport = (spdk, uangs) => {
 }
 
 export const hotelCalculate = (spdk, uangs) => {
-    const jumlah_hari = spdk.lama_hari - 1;
+    // const jumlah_hari = spdk.lama_hari - 1;
+    const jumlah_hari = perhitungan_waktu(spdk.tgl_berangkat, spdk.jam_pergi, spdk.tgl_kembali, spdk.jam_sampai) - 1;
 
     // Variable Sarapan
     const pagu = uangs;
-    const TotPagu = jumlah_hari * pagu;
+    let TotPagu;
+    if (jumlah_hari < 0) {
+        TotPagu = 0;
+    } else {
+        TotPagu = jumlah_hari * pagu;
+    }
 
     return TotPagu;
 }
