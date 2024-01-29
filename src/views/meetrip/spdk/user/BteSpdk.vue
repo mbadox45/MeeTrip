@@ -136,7 +136,7 @@
                         const load = res.data;
                         console.log(load)
                         if (load.success == true) {
-                            reset_form();
+                            // reset_form();
                             toast.add({ severity: 'success', summary: 'Successfully', detail: `Update BTE successfully`, life: 3000 });
                             setTimeout(function() {
                                 router.push('/my-spdk');
@@ -153,7 +153,7 @@
                         const load = res.data;
                         console.log(load)
                         if (load.success == true) {
-                            reset_form();
+                            // reset_form();
                             toast.add({ severity: 'success', summary: 'Successfully', detail: `Create BTE successfully`, life: 3000 });
                             setTimeout(function() {
                                 router.push('/my-spdk');
