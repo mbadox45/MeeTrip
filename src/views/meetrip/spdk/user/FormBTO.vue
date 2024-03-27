@@ -6,7 +6,7 @@
     import axios from 'axios';
 
     // Components
-    import ViewMaps from './components/ViewMaps.vue'
+    import ViewMaps from '@/views/meetrip/spdk/user/components/ViewMaps.vue'
 
     // API
     import UserService from '@/api/UserService'
@@ -24,7 +24,7 @@
     const loading = ref(true);
     const roles = ref(localStorage.getItem('roles'));
     const payload = ref(JSON.parse(localStorage.getItem('payload')));
-    const form = ref({id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'-', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]})
+    const form = ref({id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'-', uang_panjar: 0, start_latitude:null, start_longitude:null, latitude:[], longitude:[]})
     const kendaraan_list = ref(kendaraan);
     const dp_list = ref(down_payment);
     const visible = ref(false);
@@ -141,7 +141,7 @@
     };
 
     const reset_form = () => {
-        form.value = {id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'-', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]}
+        form.value = {id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'-', uang_panjar: 0, start_latitude:null, start_longitude:null, latitude:[], longitude:[]}
         location.value = [
             {locate:null, list_location:[], placeholder:'Start Location'}, 
             {locate:null, list_location:[], placeholder:'Destination Location'}
@@ -558,7 +558,7 @@
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-bookmark"></i>
                         </span>
-                        <Dropdown v-model="form.uang_panjar" :options="dp_list" optionLabel="name" optionValue="uang_panjar" placeholder="Select a Down Payment" class="">
+                        <Dropdown v-model="form.uang_panjar" :options="dp_list" optionLabel="name" optionValue="uang_panjar" disabled placeholder="Select a Down Payment" class="">
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
                                     <span v-html="slotProps.option.icon"></span>
