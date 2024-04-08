@@ -65,7 +65,7 @@ const loadParams = async () => {
                                 roles = 'superadmin';
                             } else if (index.level_akses == 9) {
                                 roles = 'adminga';
-                            } else if (index.level_akses == 5) {
+                            } else if (index.level_akses >= 5 && index.level_akses < 9) {
                                 roles = 'adminsdm';
                             } else {
                                 roles = 'user';

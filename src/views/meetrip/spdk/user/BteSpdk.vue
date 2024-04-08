@@ -136,7 +136,8 @@
 
     const postData = (ket) => {
         if (ket == 'save') {
-            if ( form.value.sarapan != null && form.value.makan_siang != null && form.value.makan_malam != null && form.value.airport != null && form.value.uang_saku != null && form.value.uang_hotel != null && form.value.uang_laundry != null && form.value.uang_transport_dilokasi != null && form.value.uang_tiket != null && form.value.uang_pp != null) {
+            if ( form.value.airport != null && form.value.uang_saku != null && form.value.uang_hotel != null && form.value.uang_laundry != null && form.value.uang_transport_dilokasi != null && form.value.uang_tiket != null && form.value.uang_pp != null) {
+            // if ( form.value.sarapan != null && form.value.makan_siang != null && form.value.makan_malam != null && form.value.airport != null && form.value.uang_saku != null && form.value.uang_hotel != null && form.value.uang_laundry != null && form.value.uang_transport_dilokasi != null && form.value.uang_tiket != null && form.value.uang_pp != null) {
                 const test = lain_lain.value;
                 const lain = []
                 const nilai = []
@@ -144,6 +145,9 @@
                     nilai[i] = test[i].nilai
                     lain[i] = test[i].lain
                 }
+                form.value.sarapan = 0;
+                form.value.makan_siang = 0;
+                form.value.makan_malam = 0;
                 form.value.uang_komunikasi = form.value.komunikasi == null ? 0 : form.value.komunikasi
                 form.value.uang_pp = form.value.uang_pp == null ? 0 : form.value.uang_pp
                 form.value.lain = lain
@@ -211,6 +215,15 @@
         </div>
         <div class="card shadow-4"  v-show=" loadingTable2 == false">
             <div class="grid align-items-end">
+                <div class="col-12 md:col-12 sm:col-12 p-fluid">
+                    <p class="text-lg font-semibold">DOLLAR EXCHANGE RATE</p>
+                    <div class="p-inputgroup">
+                        <span class="p-inputgroup-addon">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><path d="M374.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-320 320c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l320-320zM128 128A64 64 0 1 0 0 128a64 64 0 1 0 128 0zM384 384a64 64 0 1 0 -128 0 64 64 0 1 0 128 0z"/></svg>
+                        </span>
+                        <InputNumber v-model="form.kurs_usd" inputId="integeronly" disabled/>
+                    </div>
+                </div>
                 <div class="col-12 md:col-3 sm:col-6 p-fluid">
                     <p class="text-lg font-semibold">DEPARTURE</p>
                     <div class="p-inputgroup">
@@ -245,16 +258,8 @@
                         <InputText type="time" v-model="form_date.jam_sampai" inputId="integeronly" @change="nilai_max_calulate"/>
                     </div>
                 </div>
-                <div class="col-12 md:col-3 sm:col-6 p-fluid">
-                    <p class="text-lg font-semibold">DOLLAR EXCHANGE RATE</p>
-                    <div class="p-inputgroup">
-                        <span class="p-inputgroup-addon">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><path d="M374.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-320 320c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l320-320zM128 128A64 64 0 1 0 0 128a64 64 0 1 0 128 0zM384 384a64 64 0 1 0 -128 0 64 64 0 1 0 128 0z"/></svg>
-                        </span>
-                        <InputNumber v-model="form.kurs_usd" inputId="integeronly" disabled/>
-                    </div>
-                </div>
-                <div class="col-12 md:col-3 sm:col-6 p-fluid">
+                
+                <!-- <div class="col-12 md:col-3 sm:col-6 p-fluid">
                     <p class="text-lg font-semibold">CONSUMPTION BUDGET</p>
                     <div class="p-inputgroup">
                         <span class="p-inputgroup-addon">
@@ -274,12 +279,11 @@
                 <div class="col-12 md:col-3 p-fluid">
                     <div class="p-inputgroup">
                         <span class="p-inputgroup-addon">
-                            <!-- <i class="pi pi-clock"></i> -->
                             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M169.7 .9c-22.8-1.6-41.9 14-47.5 34.7L110.4 80c.5 0 1.1 0 1.6 0c176.7 0 320 143.3 320 320c0 .5 0 1.1 0 1.6l44.4-11.8c20.8-5.5 36.3-24.7 34.7-47.5C498.5 159.5 352.5 13.5 169.7 .9zM399.8 410.2c.1-3.4 .2-6.8 .2-10.2c0-159.1-128.9-288-288-288c-3.4 0-6.8 .1-10.2 .2L.5 491.9c-1.5 5.5 .1 11.4 4.1 15.4s9.9 5.6 15.4 4.1L399.8 410.2zM176 208a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm64 128a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zM96 384a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
                         </span>
                         <InputNumber v-model="form.makan_malam" :min="0" :max="dis_form.makan_malam" placeholder="Dinner Fee"/>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-12 md:col-3 p-fluid">
                     <p class="text-lg font-semibold">TRANSPORTATION BUDGET</p>
                     <div class="p-inputgroup">
@@ -335,7 +339,7 @@
                         <span class="p-inputgroup-addon">
                             <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
                         </span>
-                        <InputNumber v-model="form.uang_saku" :min="0" :max="dis_form.uang_saku" placeholder="Pocket Money"/>
+                        <InputNumber v-model="form.uang_saku" :min="0" :max="dis_form.uang_saku" placeholder="Money per Diem"/>
                     </div>
                 </div>
                 <div class="col-12 md:col-3 p-fluid">

@@ -28,6 +28,11 @@
     const kendaraan_list = ref(kendaraan);
     const dp_list = ref(down_payment);
     const visible = ref(false);
+
+    const disabled_dp = ref(false)
+    const loading_input_dp = ref(false)
+
+    // Variable for input route trip
     const location = ref([
         {locate:null, list_location:[], placeholder:'Start Location'}, 
         {locate:null, list_location:[], placeholder:'Destination Location'}
@@ -36,6 +41,8 @@
     const destination_location = ref(null)
     const list_start_location = ref([])
     const list_destination_location = ref([])
+
+    // Message Variable
     let count = ref(0);
     const messagess = ref([]);
     const messages = ref(false)
@@ -119,12 +126,10 @@
         if (formID == null) {
             await loadUser();
             reset_form();
-            console.log(formID);
             loading.value = false;
         } else {
             await load_spdk()
             await loadUser();
-            console.log(formID);
             loading.value = false;
         }
     }
@@ -141,7 +146,7 @@
     };
 
     const reset_form = () => {
-        form.value = {id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'-', uang_panjar: 0, start_latitude:null, start_longitude:null, latitude:[], longitude:[]}
+        form.value = {id:null, atasan_id:null, lampiran:null, keperluan:'', tgl_berangkat:'', tgl_kembali:'', jam_pergi:'', jam_sampai:'', lama_hari:null, barang:null, kendaraan:null, rombongan:'-', uang_panjar: null, start_latitude:null, start_longitude:null, latitude:[], longitude:[]}
         location.value = [
             {locate:null, list_location:[], placeholder:'Start Location'}, 
             {locate:null, list_location:[], placeholder:'Destination Location'}
@@ -186,8 +191,24 @@
 
     // Show Dialog Maps
     const viewMap = () => {
-        visible.value = true;
-        console.log(location.value);
+        const loc = location.value;
+        let list_country = [];
+        for (let i = 1; i < loc.length; i++) {
+            if (loc[i].locate != null) {
+                const description = loc[i].locate.description;
+                const getCountry = description.split(',').map(word => word.trim());
+                const country = getCountry[getCountry.length - 1].toLowerCase();
+                list_country.push(country);
+            } else {
+                list_country.push('');
+            }
+        }
+        const isSameCountry = compareArrays(list_country);
+        if (isSameCountry == 'kosong') {
+            visible.value = false;
+        } else {
+            visible.value = true;
+        }
     }
 
     // Get Longitude Latitude By Place_id
@@ -288,9 +309,55 @@
         }
     };
 
+    // Function to compare arrays
+    const compareArrays = (arr) => {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] == '') {
+                return 'kosong';
+            } else {
+                if (arr[i] !== "indonesia") {
+                    return 'ln';
+                }
+            }
+        }
+        return 'dn';
+    }
+
+    const compareRegion = (index) => {
+        if (index > 0) {
+            loading_input_dp.value = true;
+            setTimeout(function() {
+                const loc = location.value;
+                let list_country = [];
+                for (let i = 0; i < loc.length; i++) {
+                    if (loc[i].locate != null) {
+                        const description = loc[i].locate.description;
+                        const getCountry = description.split(',').map(word => word.trim());
+                        const country = getCountry[getCountry.length - 1].toLowerCase();
+                        list_country.push(country);
+                    } else {
+                        list_country.push('');
+                    }
+                }
+                const isSameCountry = compareArrays(list_country);
+                if (isSameCountry == 'ln') {
+                    disabled_dp.value = false;
+                    form.value.uang_panjar = null;
+                    loading_input_dp.value = false;
+                } else {
+                    disabled_dp.value = true;
+                    form.value.uang_panjar = 0;
+                    loading_input_dp.value = false;
+                }
+                console.log(isSameCountry, disabled_dp.value)
+            }, 3000);
+        }
+    }
+
     // Post Data to BE_API
     const postData = async () => {
         const loc = location.value;
+        console.log(loc)
         if (loc[0].locate != null && form.value.atasan_id != null && form.value.keperluan != '' && form.value.tgl_berangkat != '' && form.value.tgl_kembali != '' && form.value.jam_pergi != '' && form.value.jam_sampai != '' && form.value.barang != null && form.value.kendaraan != null && form.value.uang_panjar != null) {
             // Form Data with Append
             let formData = new FormData();
@@ -310,7 +377,6 @@
             form.value.start_longitude = Number(gets.lng);
             formData.append('start_latitude', form.value.start_latitude);
             formData.append('start_longitude', form.value.start_longitude);
-            
             for (let i = 1; i < loc.length; i++) {
                 const locate = await getLongLat(loc[i].locate.place_id);
                 formData.append(`latitude[${i-1}]`, locate.lat);
@@ -442,7 +508,7 @@
                         <Dropdown v-model="form.atasan_id" :options="list_atasan" filter optionLabel="name" optionValue="id" placeholder="Choose a assignor" class="w-full"> 
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
-                                    <Avatar icon="pi pi-user" style="background-color: #E59866 color: #ffffff" class="mr-2" shape="circle" />
+                                    <Avatar icon="pi pi-user" style="background-color: #E59866; color: #ffffff;" class="mr-2" shape="circle" />
                                     <div>{{ slotProps.option.name }}</div>
                                 </div>
                             </template>
@@ -472,7 +538,7 @@
                                     <i class="pi pi-calendar"></i>
                                 </span>
                                 <InputText type="date" v-if="formID != null && roles == 'adminga'" v-model="form.tgl_berangkat" placeholder=""/>
-                                <InputText type="date" v-else v-model="form.tgl_berangkat" :min="moment(new Date).format('YYYY-MM-DD')" :class="{ 'p-invalid': errorMessage }" placeholder=""/>
+                                <InputText type="date" v-else v-model="form.tgl_berangkat" :min="moment(new Date).format('YYYY-MM-DD')" placeholder=""/>
                             </div>
                         </div>
                         <div class="col-12 md:6">
@@ -556,9 +622,10 @@
                     <p class="text-lg font-semibold text-gray-500">DOWN PAYMENT</p>
                     <div class="p-inputgroup">
                         <span class="p-inputgroup-addon">
-                            <i class="pi pi-bookmark"></i>
+                            <i class="pi pi-money-bill" v-if="loading_input_dp == false"></i>
+                            <i class="pi pi-spin pi-spinner" v-else></i>
                         </span>
-                        <Dropdown v-model="form.uang_panjar" :options="dp_list" optionLabel="name" optionValue="uang_panjar" disabled placeholder="Select a Down Payment" class="">
+                        <Dropdown v-model="form.uang_panjar" :options="dp_list" optionLabel="name" optionValue="uang_panjar" :disabled="disabled_dp" placeholder="Select a Down Payment" class="">
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
                                     <span v-html="slotProps.option.icon"></span>

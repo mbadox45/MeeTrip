@@ -4,6 +4,13 @@ export const mata_uang = [
     {id:38, wilayah:'luar wilayah', jabatan:2, pagi:50000, siang:50000, malam:50000, hotel:500000, laundry:25000, pp:0, transport_lokal:250000, saku:150000, komunikasi:0, airport:400000, official:0}
 ];
 
+export const bom = [
+    {name:'BOM - 1', bom:'1'},
+    {name:'BOM - 2', bom:'2'},
+    {name:'BOM - 3', bom:'3'},
+    {name:'BOM - 4', bom:'4'},
+]
+
 export const bg_color = [
     {status:'0', color:'red-600'},
     {status:'300', color:'cyan-500'},
@@ -208,6 +215,23 @@ export const hotelCalculate = (spdk, uangs) => {
     const pagu = uangs;
     let TotPagu;
     if (jumlah_hari < 0) {
+        TotPagu = 0;
+    } else {
+        TotPagu = jumlah_hari * pagu;
+    }
+
+    return TotPagu;
+}
+
+export const laundryCalculate = (spdk, uangs) => {
+    // const jumlah_hari = spdk.lama_hari - 1;
+    const jumlah_hari = perhitungan_waktu(spdk.tgl_berangkat, spdk.jam_pergi, spdk.tgl_kembali, spdk.jam_sampai) - 1;
+
+    // Variable Sarapan
+    const pagu = uangs;
+    let TotPagu;
+    console.log(jumlah_hari)
+    if (jumlah_hari < 2) {
         TotPagu = 0;
     } else {
         TotPagu = jumlah_hari * pagu;

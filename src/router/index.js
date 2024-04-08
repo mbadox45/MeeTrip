@@ -74,6 +74,7 @@ const router = createRouter({
                     meta:{
                         requiresAuth: true,
                         adminga:true,
+                        adminsdm:true,
                         user:true,
                     }
                 },
@@ -162,6 +163,16 @@ const router = createRouter({
                         superadmin:true,
                         // adminsdm:true,
                         adminga:true,
+                    }
+                },
+                {
+                    path: '/bom',
+                    name: 'bom',
+                    component: () => import('@/views/meetrip/spdk/admin_hc/BomPage.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        superadmin:true,
+                        adminsdm:true,
                     }
                 },
 

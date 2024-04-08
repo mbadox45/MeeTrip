@@ -63,6 +63,7 @@ export const menu_adminsdm = [
                     { label: 'BTO - Approve', icon: 'pi pi-fw pi-bookmark', to: '/bto-spdk' },
                 ]
             },
+            { label: 'BOM', icon: 'pi pi-fw pi-star', to: '/bom' },
             { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', to: '/booked' },
         ]
     },
@@ -94,6 +95,7 @@ export const menu_adminsdm_approve = [
                     ] },
                 ]
             },
+            { label: 'BOM', icon: 'pi pi-fw pi-star', to: '/bom' },
             { label: 'Meeting Room', icon: 'pi pi-fw pi-tag', to: '/booked' },
         ]
     },

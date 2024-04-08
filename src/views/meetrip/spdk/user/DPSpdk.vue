@@ -9,12 +9,15 @@
     import User_DpService from '@/api/user/DpService';
     import Misc_PaguService from '@/api/misc/PaguService'
     import VerifyService from '@/api/VerifyService'
-    import {calculateConsumtionMax, localTransport, hotelCalculate} from '@/api/Databodong'
+    import {calculateConsumtionMax, localTransport, hotelCalculate, laundryCalculate} from '@/api/Databodong'
 
+    // Components
+    import DetailSpdk from '@/views/meetrip/spdk/user/components/DetailSpdk.vue';
 
     const payload = ref(JSON.parse(localStorage.getItem('payload')));
     const wilayah = ref(["dalam wilayah", "luar wilayah", "luar negeri"])
     const uangNegara = ref(null);
+    const dialogs = ref(false)
     const dataSPDK = ref(null);
     const dis_form = ref({sarapan:null, makan_malam:null, makan_siang:null, airport:null, saku:null, official:null, dualima:null, seratussatu:null, duaratus:null, hotel:null, laundry:null, transport_dilokasi:null, tiket:null, komunikasi:null})
     const form = ref({id:null, kurs_usd:0, sarapan:null, makan_siang:null, makan_malam:null, saku:null, official:null, dualima:null, seratussatu:null, duaratus:null, hotel:null, laundry:null, transport_dilokasi:null, tiket:null, komunikasi:null, airport:null})
@@ -77,6 +80,7 @@
         // Filter By Wilayah + Jabatan
         const region =  wilayah.value[Number(spdk.wilayah)-1]
         const filteredData = data.filter(item => item.wilayah === region && item.jabatan === spdk.golongan);
+        uangNegara.value = filteredData[0];
         // console.log(filteredData)
         console.log(filteredData[0])
         dis_form.value = {
@@ -89,7 +93,7 @@
             seratussatu: Number(filteredData[0].seratus),
             duaratus: Number(filteredData[0].duaratus),
             hotel: hotelCalculate(spdk, filteredData[0].hotel),
-            laundry: hotelCalculate(spdk, filteredData[0].laundry),
+            laundry: laundryCalculate(spdk, filteredData[0].laundry),
             saku: localTransport(spdk, filteredData[0].saku),
             komunikasi: localTransport(spdk, filteredData[0].komunikasi),
             official: localTransport(spdk, filteredData[0].official),
@@ -98,7 +102,12 @@
         
         // Get Kurs
         await kursUSD(Number(spdk.wilayah));
-    } 
+    }
+
+    const showDialog = () => {
+        dialogs.value = true
+        console.log(dataSPDK.value)
+    }
 
     const kursUSD = async(reg) => {
         if (reg > 2) {
@@ -179,6 +188,14 @@
 <template>
     <form class=" py-3">
         <Toast/>
+        <Dialog v-model:visible="dialogs" modal header="Header" :style="{ width: '85rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <template #header>
+                <h4>View Detail</h4>
+            </template>
+            <Divider><strong>BTO</strong></Divider>
+            <div></div>
+            <Divider><strong>Budged</strong></Divider>
+        </Dialog>
         <div class="flex align-items-center justify-content-end md:justify-content-between mb-5 px-2">
             <div class="">
                 <i class="mr-4 text-2xl md:text-5xl pi pi-ticket"></i>
@@ -190,16 +207,21 @@
         </div>
         <div class="card shadow-4">
             <div class="grid align-items-end">
-                <div class="col-12 md:col-3 sm:col-6 p-fluid">
-                    <p class="text-lg font-semibold">DOLLAR EXCHANGE RATE</p>
-                    <div class="p-inputgroup">
+                <div class="col-12 md:col-12 sm:col-12 ">
+                    <div class="flex justify-content-between my-3 align-items-center">
+                        <span class="text-lg font-semibold">
+                            DOLLAR EXCHANGE RATE
+                        </span>
+                        <Button icon="pi pi-money-bill" label="View BTO & Budget" severity="small" link class="py-1 px-2 text-xs" @click="showDialog"/>
+                    </div>
+                    <div class="p-inputgroup p-fluid">
                         <span class="p-inputgroup-addon">
                             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><path d="M374.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-320 320c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l320-320zM128 128A64 64 0 1 0 0 128a64 64 0 1 0 128 0zM384 384a64 64 0 1 0 -128 0 64 64 0 1 0 128 0z"/></svg>
                         </span>
                         <InputNumber v-model="form.kurs_usd" inputId="integeronly" disabled/>
                     </div>
                 </div>
-                <div class="col-12 md:col-3 sm:col-6 p-fluid">
+                <!-- <div class="col-12 md:col-3 sm:col-6 p-fluid">
                     <p class="text-lg font-semibold">CONSUMPTION BUDGET</p>
                     <div class="p-inputgroup">
                         <span class="p-inputgroup-addon">
@@ -219,12 +241,11 @@
                 <div class="col-12 md:col-3 p-fluid">
                     <div class="p-inputgroup">
                         <span class="p-inputgroup-addon">
-                            <!-- <i class="pi pi-clock"></i> -->
                             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M169.7 .9c-22.8-1.6-41.9 14-47.5 34.7L110.4 80c.5 0 1.1 0 1.6 0c176.7 0 320 143.3 320 320c0 .5 0 1.1 0 1.6l44.4-11.8c20.8-5.5 36.3-24.7 34.7-47.5C498.5 159.5 352.5 13.5 169.7 .9zM399.8 410.2c.1-3.4 .2-6.8 .2-10.2c0-159.1-128.9-288-288-288c-3.4 0-6.8 .1-10.2 .2L.5 491.9c-1.5 5.5 .1 11.4 4.1 15.4s9.9 5.6 15.4 4.1L399.8 410.2zM176 208a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm64 128a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zM96 384a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
                         </span>
                         <InputNumber v-model="form.makan_malam" :min="0" :max="dis_form.makan_malam" placeholder="Dinner Fee"/>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-12 md:col-3 p-fluid">
                     <p class="text-lg font-semibold">TRANSPORTATION BUDGET</p>
                     <div class="p-inputgroup">
@@ -300,14 +321,22 @@
                         <InputNumber v-model="form.laundry" :min="0" :max="dis_form.laundry" placeholder="Laundry Fee"/>
                     </div>
                 </div>
-                <div class="col-12 md:col-3 p-fluid">
+                <div class="col-12 md:col-3 sm:col-6 p-fluid">
+                    <div class="p-inputgroup">
+                        <span class="p-inputgroup-addon">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M61.1 224C45 224 32 211 32 194.9c0-1.9 .2-3.7 .6-5.6C37.9 168.3 78.8 32 256 32s218.1 136.3 223.4 157.3c.5 1.9 .6 3.7 .6 5.6c0 16.1-13 29.1-29.1 29.1H61.1zM144 128a16 16 0 1 0 -32 0 16 16 0 1 0 32 0zm240 16a16 16 0 1 0 0-32 16 16 0 1 0 0 32zM272 96a16 16 0 1 0 -32 0 16 16 0 1 0 32 0zM16 304c0-26.5 21.5-48 48-48H448c26.5 0 48 21.5 48 48s-21.5 48-48 48H64c-26.5 0-48-21.5-48-48zm16 96c0-8.8 7.2-16 16-16H464c8.8 0 16 7.2 16 16v16c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V400z"/></svg>
+                        </span>
+                        <InputNumber v-model="form.sarapan" inputId="minmax" :min="0" :max="dis_form.sarapan" placeholder="Diem Fee" />
+                    </div>
+                </div>
+                <!-- <div class="col-12 md:col-3 p-fluid">
                     <div class="p-inputgroup">
                         <span class="p-inputgroup-addon">
                             <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
                         </span>
-                        <InputNumber v-model="form.saku" :min="0" :max="dis_form.saku" placeholder="Pocket Money"/>
+                        <InputNumber v-model="form.saku" :min="0" :max="dis_form.saku" placeholder="Diem Fee"/>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-12 md:col-3 p-fluid">
                     <div class="p-inputgroup">
                         <span class="p-inputgroup-addon">
