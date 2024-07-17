@@ -175,6 +175,16 @@ const router = createRouter({
                         adminsdm:true,
                     }
                 },
+                {
+                    path: '/budged-celling',
+                    name: 'budged-celling',
+                    component: () => import('@/views/meetrip/spdk/admin_ga/BudgedCelling.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        superadmin:true,
+                        adminga:true,
+                    }
+                },
 
                 // Roles Pemberi Tugas
                 // {

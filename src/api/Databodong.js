@@ -11,6 +11,8 @@ export const bom = [
     {name:'BOM - 4', bom:'4'},
 ]
 
+export const wilayah = ['Dalam Wilayah', 'Luar Wilayah', 'Luar Negeri'];
+
 export const bg_color = [
     {status:'0', color:'red-600'},
     {status:'300', color:'cyan-500'},

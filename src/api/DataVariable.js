@@ -119,6 +119,7 @@ export const menu_adminga = [
                 ]
             },
             { label: 'All SPDK', icon: 'pi pi-fw pi-list', to: '/all-spdk' },
+            { label: 'Budged Celling', icon: 'pi pi-fw pi-dollar', to: '/budged-celling' },
         ]
     },
     {

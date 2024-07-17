@@ -324,7 +324,7 @@
                         </Column>
                         <Column field="info" header="Information" style="min-width: 12rem">
                             <template #body="{ data }">
-                                <div :class="`bg-${data.color.color} p-2 text-white font-semibold border-round text-sm`">{{ data.info }}</div>
+                                <div :class="`bg-${data.color} p-2 text-white font-semibold border-round text-sm`">{{ data.info }}</div>
                             </template>
                         </Column>
                         <Column field="created_at" header="Created Date" style="min-width: 12rem">
